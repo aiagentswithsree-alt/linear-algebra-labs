@@ -11,7 +11,7 @@ Each lab turns one chapter into short missions: **see the problem â†’ predict â†
 
 ## How to use
 
-Open `ch01-vectors/index.html` in any browser. No install or internet needed apart from web fonts.
+Open `index.html` (chapter list) or `ch01-vectors/index.html` in any browser. No install or internet needed apart from web fonts.
 Progress is saved in your browser.
 
 ## Chapter 1 missions
