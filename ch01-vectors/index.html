@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vector Lab — Chapter 1: Learn by Doing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6fb;--card:#ffffff;--ink:#1d2433;--muted:#5d6678;--line:#e3e6ee;
+  --accent:#4f46e5;--accent2:#0ea5e9;--parcel:#f59e0b;--ok:#15803d;--bad:#b91c1c;
+  --okbg:#ecfdf3;--badbg:#fef2f2;--infobg:#eef2ff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;font-size:15px}
+header{max-width:1120px;margin:0 auto;padding:22px 24px 6px}
+h1{font-size:22px;margin:0 0 2px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.loop{display:inline-flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.loop span{font-size:12px;font-weight:600;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.progress{max-width:1120px;margin:14px auto 0;padding:0 24px}
+.bar{height:6px;background:#e6e8f0;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .5s}
+nav{max-width:1120px;margin:10px auto 0;padding:0 24px;display:flex;gap:8px;flex-wrap:wrap}
+nav button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:7px 12px;cursor:pointer;display:flex;gap:6px;align-items:center}
+nav button[disabled]{opacity:.45;cursor:not-allowed}
+nav button.cur{border-color:var(--accent);box-shadow:0 0 0 3px #e0e7ff}
+nav button .st{font-size:12px}
+main{max-width:1120px;margin:16px auto 48px;padding:0 24px;display:grid;grid-template-columns:minmax(300px,470px) 1fr;gap:20px;align-items:start}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.board{position:sticky;top:12px}
+@media(max-width:860px){.board{position:static}}
+svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.dot.r{background:#334155}.dot.p{background:var(--parcel)}
+.mhead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.num{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.chip{font-size:12px;background:var(--infobg);color:var(--accent);border-radius:999px;padding:2px 9px;font-weight:600}
+.chip.t{background:#f1f5f9;color:var(--muted)}
+h2{font-size:20px;margin:6px 0 8px}
+.story{color:#374151;margin:0 0 12px}
+.step{border-top:1px dashed var(--line);padding-top:12px;margin-top:12px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.q{font-weight:600;margin-bottom:8px}
+.muted{color:var(--muted);font-size:14px}
+.btn{font:inherit;font-weight:600;font-size:14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;cursor:pointer;margin:4px 6px 4px 0}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:not(:disabled):hover{filter:brightness(.96)}
+.inrow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:6px 0}
+label.f{display:flex;flex-direction:column;font-size:13px;color:var(--muted);gap:4px}
+input[type=number]{font:inherit;font-family:'JetBrains Mono',monospace;font-size:16px;width:84px;padding:7px 9px;border:1.5px solid #cbd2e1;border-radius:9px;text-align:center}
+input[type=number]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px #e0e7ff}
+.vecin{display:inline-flex;flex-direction:column;gap:6px;padding:6px 8px;border-left:2.5px solid var(--ink);border-right:2.5px solid var(--ink);border-radius:6px;vertical-align:middle}
+.vecin input{width:70px}
+.vec{display:inline-flex;flex-direction:column;align-items:center;font-family:'JetBrains Mono',monospace;font-weight:700;line-height:1.25;padding:1px 7px;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:4px;vertical-align:middle;margin:0 3px;font-size:14px}
+.fb{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14px;display:none}
+.fb.ok{display:block;background:var(--okbg);color:#14532d;border:1px solid #bbf7d0}
+.fb.bad{display:block;background:var(--badbg);color:#7f1d1d;border:1px solid #fecaca}
+.fb.info{display:block;background:var(--infobg);color:#312e81;border:1px solid #c7d2fe}
+.concept{background:linear-gradient(180deg,#f8f9ff,#fff);border:1px solid #c7d2fe;border-radius:12px;padding:12px 14px;margin-top:12px}
+.concept h3{margin:0 0 6px;font-size:15px;color:var(--accent)}
+.concept p{margin:6px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}
+.grid3 div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px}
+.grid3 b{display:block;font-size:13px;margin-bottom:2px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{font:inherit;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:14px}
+.opt:not(:disabled):hover{border-color:#a5b4fc}
+.opt.right{border-color:#86efac;background:var(--okbg)}
+.opt.wrong{border-color:#fca5a5;background:var(--badbg)}
+.slider{display:flex;align-items:center;gap:12px;margin:8px 0}
+input[type=range]{flex:1;accent-color:var(--accent)}
+.kval{font-family:'JetBrains Mono',monospace;font-weight:700;min-width:64px}
+.note{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 12px;font-size:14px;margin:8px 0}
+.next{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.score{font-size:13px;color:var(--muted)}
+.done-list{margin:8px 0 0;padding-left:20px}
+.done-list li{margin:3px 0}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Vector Lab · Chapter 1: What is a vector?</h1>
+  <p class="sub">Learn by doing: guide a delivery robot around a room grid. Every idea from the video is something you'll predict, try and then explain.</p>
+  <div class="loop"><span>1 · See the problem</span><span>2 · Predict</span><span>3 · Try it</span><span>4 · Learn the maths</span></div>
+</header>
+<div class="progress"><div class="bar"><i id="bar"></i></div></div>
+<nav id="nav"></nav>
+<main id="app"></main>
+
+<script>
+/* ---------- constants & helpers ---------- */
+const S=40,O=220,R=5;
+const C={accent:'#4f46e5',accent2:'#0ea5e9',muted:'#94a3b8',bad:'#dc2626',ok:'#16a34a',parcel:'#f59e0b'};
+const NS='http://www.w3.org/2000/svg';
+const P=(x,y)=>[O+S*x,O-S*y];
+const eq=(a,b)=>a&&b&&a[0]===b[0]&&a[1]===b[1];
+const fmt=n=>{if(Number.isInteger(n))return n<0?'−'+Math.abs(n):String(n);const s=String(n);return n<0?'−'+s.slice(1):s};
+const vec=(a,b)=>`<span class="vec"><span>${fmt(a)}</span><span>${fmt(b)}</span></span>`;
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+function el(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function h(tag,attrs={},html=''){const e=document.createElement(tag);for(const k in attrs){if(k==='class')e.className=attrs[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}if(html)e.innerHTML=html;return e}
+function btn(text,fn,cls=''){return h('button',{class:'btn '+cls,onclick:fn},text)}
+function fbBox(){return h('div',{class:'fb',role:'status','aria-live':'polite'})}
+function setFb(box,type,html){box.className='fb '+type;box.innerHTML=html}
+function concept(title,html){return h('div',{class:'concept'},`<h3>${title}</h3>${html}`)}
+function inRange(p){return p&&Math.abs(p[0])<=R&&Math.abs(p[1])<=R}
+
+/* ---------- board ---------- */
+function makeBoard(){
+  const svg=el('svg',{viewBox:'0 0 440 440',role:'img','aria-label':'Room grid with robot'});
+  const defs=el('defs',{},svg);
+  for(const c in C){const m=el('marker',{id:'ah-'+c,viewBox:'0 0 10 10',refX:'8.5',refY:'5',markerWidth:'5.5',markerHeight:'5.5',orient:'auto'},defs);el('path',{d:'M0,0 L10,5 L0,10 z',fill:C[c]},m)}
+  const grid=el('g',{},svg);
+  el('rect',{x:20,y:20,width:400,height:400,fill:'#fbfcff',rx:6},grid);
+  for(let i=-R;i<=R;i++){
+    const [x]=P(i,0),[,y]=P(0,i),ax=i===0;
+    el('line',{x1:x,y1:20,x2:x,y2:420,stroke:ax?'#475569':'#e6e9f0','stroke-width':ax?1.6:1},grid);
+    el('line',{x1:20,y1:y,x2:420,y2:y,stroke:ax?'#475569':'#e6e9f0','stroke-width':ax?1.6:1},grid);
+    if(i!==0){
+      el('text',{x,y:O+15,'font-size':10,fill:'#94a3b8','text-anchor':'middle','font-family':'Inter'},grid).textContent=fmt(i);
+      el('text',{x:O-7,y:y+3.5,'font-size':10,fill:'#94a3b8','text-anchor':'end','font-family':'Inter'},grid).textContent=fmt(i);
+    }
+  }
+  el('text',{x:412,y:O-6,'font-size':12,'font-weight':700,fill:'#475569','text-anchor':'end'},grid).textContent='x';
+  el('text',{x:O+7,y:32,'font-size':12,'font-weight':700,fill:'#475569'},grid).textContent='y';
+  el('circle',{cx:O,cy:O,r:3,fill:'#475569'},grid);
+  const L={guide:el('g',{},svg),arrows:el('g',{},svg),items:el('g',{},svg),ghost:el('g',{},svg),robot:el('g',{},svg)};
+  return {svg,L,clear(...n){n.forEach(k=>L[k].innerHTML='')}};
+}
+function robot(b,pos){
+  const g=el('g',{},b.L.robot);
+  el('line',{x1:0,y1:-12,x2:0,y2:-19,stroke:'#334155','stroke-width':2},g);
+  el('circle',{cx:0,cy:-20,r:2.8,fill:'#f43f5e'},g);
+  el('rect',{x:-12,y:-12,width:24,height:24,rx:7,fill:'#334155'},g);
+  el('circle',{cx:-5,cy:-3,r:2.8,fill:'#a5f3fc'},g);el('circle',{cx:5,cy:-3,r:2.8,fill:'#a5f3fc'},g);
+  el('rect',{x:-5,y:4,width:10,height:2.6,rx:1.3,fill:'#a5f3fc'},g);
+  place(g,pos);return g;
+}
+function place(g,pos){const [x,y]=P(pos[0],pos[1]);g.setAttribute('transform',`translate(${x},${y})`);g.pos=[pos[0],pos[1]]}
+function parcel(b,p,label='parcel'){
+  const [x,y]=P(...p);const g=el('g',{transform:`translate(${x},${y})`},b.L.items);
+  el('rect',{x:-11,y:-11,width:22,height:22,rx:4,fill:C.parcel},g);
+  el('line',{x1:-11,y1:0,x2:11,y2:0,stroke:'#b45309','stroke-width':2},g);
+  el('line',{x1:0,y1:-11,x2:0,y2:11,stroke:'#b45309','stroke-width':2},g);
+  if(label){el('text',{x:14,y:-12,'font-size':12,'font-weight':600,fill:'#b45309'},g).textContent=label}
+  return g;
+}
+function arrow(b,from,to,color='accent',o={}){
+  const [x1,y1]=P(...from),[x2,y2]=P(...to);if(Math.hypot(x2-x1,y2-y1)<2)return null;
+  const g=el('g',{},b.L[o.layer||'arrows']);
+  const a={x1,y1,x2,y2,stroke:C[color],'stroke-width':o.w||3.2,'stroke-linecap':'round','marker-end':`url(#ah-${color})`,opacity:o.op||1};
+  if(o.dash)a['stroke-dasharray']='6 5';
+  el('line',a,g);
+  if(o.label)label(g,x1,y1,x2,y2,o.label,C[color]);
+  return g;
+}
+function label(g,x1,y1,x2,y2,text,color){
+  const mx=(x1+x2)/2,my=(y1+y2)/2,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1;
+  const nx=-dy/len*14,ny=dx/len*14;
+  const t=el('text',{x:mx+nx,y:my+ny+4,'font-size':13,'font-weight':700,fill:color,'text-anchor':'middle','font-family':'Inter',stroke:'#fff','stroke-width':3,'paint-order':'stroke'},g);t.textContent=text;
+}
+function ghostDot(b,p,ring){if(!inRange(p))return;const [x,y]=P(...p);el('circle',{cx:x,cy:y,r:ring?10:7,fill:ring?'none':'#94a3b8',stroke:'#64748b','stroke-width':2,'stroke-dasharray':ring?'3 3':'0',opacity:.9},b.L.ghost)}
+function pulse(b,p,color=C.ok){const [x,y]=P(...p);const c=el('circle',{cx:x,cy:y,r:12,fill:'none',stroke:color,'stroke-width':3},b.L.ghost);
+  el('animate',{attributeName:'r',from:12,to:30,dur:'0.8s',repeatCount:2},c);el('animate',{attributeName:'opacity',from:1,to:0,dur:'0.8s',repeatCount:2,fill:'freeze'},c)}
+function walk(b,g,to,color='accent',o={}){
+  const from=[...g.pos];const [x1,y1]=P(...from);let line=null;
+  if(color){const a={x1,y1,x2:x1,y2:y1,stroke:C[color],'stroke-width':3.2,'stroke-linecap':'round'};if(o.dash)a['stroke-dasharray']='6 5';line=el('line',a,b.L.arrows)}
+  const ms=o.ms||Math.max(450,Math.hypot(to[0]-from[0],to[1]-from[1])*190);
+  return new Promise(res=>{const t0=performance.now();
+    function step(t){const k=Math.min(1,(t-t0)/ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      const p=[from[0]+(to[0]-from[0])*e,from[1]+(to[1]-from[1])*e];
+      const [x,y]=P(...p);g.setAttribute('transform',`translate(${x},${y})`);
+      if(line){line.setAttribute('x2',x);line.setAttribute('y2',y)}
+      if(k<1)requestAnimationFrame(step);
+      else{place(g,to);if(line){line.setAttribute('marker-end',`url(#ah-${color})`);const [x2,y2]=P(...to);if(o.label)label(line.parentNode,x1,y1,x2,y2,o.label,C[color])}res()}}
+    requestAnimationFrame(step)});
+}
+function toGrid(svg,e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(svg.getScreenCTM().inverse());
+  return [Math.max(-R,Math.min(R,Math.round((p.x-O)/S))),Math.max(-R,Math.min(R,Math.round((O-p.y)/S)))]}
+function vecInput(onEnter){
+  const w=h('span',{class:'vecin'});
+  const a=h('input',{type:'number',step:'0.5','aria-label':'horizontal movement (x)',placeholder:'x'});
+  const c=h('input',{type:'number',step:'0.5','aria-label':'vertical movement (y)',placeholder:'y'});
+  [a,c].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'&&onEnter)onEnter()}));
+  w.append(a,c);
+  return{el:w,get(){const x=parseFloat(a.value),y=parseFloat(c.value);return isNaN(x)||isNaN(y)?null:[x,y]},disable(v){a.disabled=c.disabled=v},clear(){a.value='';c.value=''},focus(){a.focus()}};
+}
+function diagnose(ans,correct,target){
+  if(target&&eq(ans,target)&&!eq(target,correct))return "You used the parcel's <b>position</b> as the movement. Check where the robot <b>starts</b>.";
+  if(eq(ans,[-correct[0],-correct[1]]))return 'Your arrow points the opposite way. Movement is <b>target − start</b>, not start − target.';
+  if(eq(ans,[correct[1],correct[0]]))return 'You swapped the numbers. The <b>top</b> number is horizontal (x), the <b>bottom</b> is vertical (y).';
+  if(ans[0]===correct[0])return 'The horizontal part is right. Recheck the vertical part.';
+  if(ans[1]===correct[1])return 'The vertical part is right. Recheck the horizontal part.';
+  return 'Not yet. Count squares <b>from the robot</b> to the parcel: first left/right, then up/down.';
+}
+function mcq(container,q,options,onRight){
+  const s=h('div',{class:'step'},`<div class="q">${q}</div>`);const opts=h('div',{class:'opts'});const fb=fbBox();
+  options.forEach(o=>{const bt=h('button',{class:'opt',onclick:()=>{
+    if(o.ok){bt.classList.add('right');[...opts.children].forEach(c=>c.disabled=true);setFb(fb,'ok',o.why);onRight&&onRight()}
+    else{bt.classList.add('wrong');bt.disabled=true;setFb(fb,'bad',o.why)}}},o.t);opts.append(bt)});
+  s.append(opts,fb);container.append(s);return s;
+}
+
+/* ---------- missions ---------- */
+const missions=[
+{title:'Find the parcel',concept:'Coordinates',time:'2:41–3:56',build:m1},
+{title:'Command the robot',concept:'Vector = direction + length',time:'0:30–0:44, 3:22–3:48',build:m2},
+{title:'Combine two moves',concept:'Vector addition',time:'4:36–6:45',build:m3},
+{title:'Stretch, shrink, flip',concept:'Scalar multiplication',time:'6:54–8:00',build:m4},
+{title:'Fix the broken command',concept:'Position vs movement',time:'Extends the video',build:m5},
+{title:'Prove it',concept:'Put it all together',time:'Whole video + 3D',build:m6},
+];
+
+/* Mission 1: coordinates */
+function m1({b,body,complete}){
+  const items=[[3,2],[-2,-3]];let i=0;
+  body.append(h('p',{class:'story'},'The robot always starts at the <b>origin</b> (0, 0), the point where the two axes cross. Each grid square is 1 metre. To reach a parcel, the robot needs two instructions: how far to go <b>sideways</b>, then how far to go <b>up or down</b>.'));
+  const area=h('div');body.append(area);const rb=robot(b,[0,0]);
+  function round(){
+    b.clear('items','arrows','ghost','guide');place(rb,[0,0]);area.innerHTML='';
+    const p=items[i];parcel(b,p);let wrong=0;
+    const s=h('div',{class:'step'},`<div class="q">Parcel ${i+1} of ${items.length}: what two instructions get the robot to the parcel?</div>`);
+    const x=h('input',{type:'number',step:'1','aria-label':'x'}),y=h('input',{type:'number',step:'1','aria-label':'y'});
+    const row=h('div',{class:'inrow'});
+    const lx=h('label',{class:'f'},'1. Along x (right +, left −)');lx.append(x);
+    const ly=h('label',{class:'f'},'2. Then along y (up +, down −)');ly.append(y);
+    const go=btn('Check',check,'primary');row.append(lx,ly,go);
+    [x,y].forEach(n=>n.addEventListener('keydown',e=>{if(e.key==='Enter')check()}));
+    const fb=fbBox();s.append(row,fb);area.append(s);x.focus();
+    async function check(){
+      const ax=parseFloat(x.value),ay=parseFloat(y.value);
+      if(isNaN(ax)||isNaN(ay)){setFb(fb,'info','Enter both numbers first.');return}
+      b.clear('ghost');
+      if(ax===p[0]&&ay===p[1]){
+        go.disabled=true;x.disabled=y.disabled=true;
+        setFb(fb,'ok','Correct! Watch the robot follow your two instructions.');
+        await walk(b,rb,[p[0],0],'accent2',{dash:true});await walk(b,rb,p,'accent2',{dash:true});
+        arrow(b,[0,0],p,'accent',{label:'v'});pulse(b,p);
+        setFb(fb,'ok',`Correct! Your two instructions together make one arrow from the origin to the parcel. Written as a vector: ${vec(...p)}`);
+        const last=i===items.length-1;
+        if(last){
+          s.append(concept('What you just learned',`<p>The <b>coordinates</b> of a vector are instructions for getting from its tail at the origin to its tip. The <b>first</b> number is the x-movement and the <b>second</b> is the y-movement.</p>
+          <p>We write the numbers <b>vertically in square brackets</b>, like ${vec(3,2)}, so a vector isn't mistaken for a point (3, 2).</p>
+          <p>Every pair of numbers gives exactly one vector, and every vector has exactly one pair.</p>`));
+          complete();
+        }else s.append(btn('Next parcel →',()=>{i++;round()},'primary'));
+      }else{
+        wrong++;ghostDot(b,[ax,ay]);
+        let msg;
+        if(ax===p[1]&&ay===p[0]&&p[0]!==p[1])msg='You swapped the order. The <b>first</b> number is always horizontal (x), the second is vertical (y).';
+        else if(Math.abs(ax)===Math.abs(p[0])&&Math.abs(ay)===Math.abs(p[1]))msg='The distances are right, but check the signs: <b>left and down are negative</b>.';
+        else msg='Not yet. Starting at the origin, count the grid squares: first left/right, then up/down.';
+        if(inRange([ax,ay]))msg+=' (Your answer is the grey dot.)';
+        if(wrong>=2){const [px,py]=P(...p);el('line',{x1:px,y1:py,x2:px,y2:O,stroke:C.parcel,'stroke-dasharray':'4 4','stroke-width':2},b.L.guide);el('line',{x1:px,y1:py,x2:O,y2:py,stroke:C.parcel,'stroke-dasharray':'4 4','stroke-width':2},b.L.guide);msg+='<br><b>Hint:</b> follow the orange dashed lines down to the axes and read the numbers there.'}
+        setFb(fb,'bad',msg);
+      }
+    }
+  }
+  round();
+}
+
+/* Mission 2: vectors as movement */
+function m2({b,body,complete}){
+  const cmds=[[2,3],[-3,1],[-1,-4]];let i=0,pred=null,clickable=false,score=0;
+  body.append(h('p',{class:'story'},'Now <b>you</b> send the commands. A command is a vector: it tells the robot how far to move sideways and how far to move up or down. The robot starts at the origin.'));
+  const area=h('div');body.append(area);const rb=robot(b,[0,0]);
+  let runBtn,predTxt,fb,v;
+  b.svg.addEventListener('click',e=>{if(!clickable)return;pred=toGrid(b.svg,e);b.clear('ghost');ghostDot(b,pred,true);
+    runBtn.disabled=false;predTxt.innerHTML=`Your prediction: <b>(${fmt(pred[0])}, ${fmt(pred[1])})</b>. Click somewhere else to change it.`});
+  b.svg.style.cursor='crosshair';
+  function round(){
+    v=cmds[i];area.innerHTML='';b.clear('arrows','ghost');place(rb,[0,0]);pred=null;clickable=true;
+    const s=h('div',{class:'step'},`<div class="q">Command ${i+1} of ${cmds.length}: ${vec(...v)}</div>
+      <p class="muted"><b>1. Predict:</b> click the square on the grid where the robot will stop.<br><b>2. Run</b> the command and compare.</p>`);
+    predTxt=h('p',{class:'muted'},'No prediction yet. Click the grid.');runBtn=btn('▶ Run command',run,'primary');runBtn.disabled=true;fb=fbBox();
+    s.append(predTxt,runBtn,fb);area.append(s);
+  }
+  async function run(){
+    clickable=false;runBtn.disabled=true;
+    await walk(b,rb,v,'accent',{label:'v'});
+    const len=Math.hypot(...v).toFixed(2);
+    let msg;
+    if(eq(pred,v)){score++;msg='<b>Exactly right!</b> ';setFb(fb,'ok','')}
+    else if(eq(pred,[v[1],v[0]]))msg='Close: you swapped x and y. The top number is the horizontal move. ';
+    else if(eq(pred,[-v[0],-v[1]]))msg='Opposite direction: watch the signs. Negative x means left, negative y means down. ';
+    else msg=`The robot stopped at <b>(${fmt(v[0])}, ${fmt(v[1])})</b>. `;
+    msg+=`This arrow points ${v[0]>0?'right':'left'} and ${v[1]>0?'up':'down'}, and its length is √(${fmt(v[0])}² + ${fmt(v[1])}²) ≈ <b>${len} m</b>.`;
+    setFb(fb,eq(pred,v)?'ok':'bad',msg);
+    const s=fb.parentNode;
+    if(i<cmds.length-1)s.append(btn('Next command →',()=>{i++;round()},'primary'));
+    else{
+      s.append(h('p',{class:'score'},`Predictions exactly right: ${score} of ${cmds.length}`));
+      s.append(concept('Three ways to see a vector',`<p>A vector is defined by its <b>length</b> and its <b>direction</b>. In linear algebra, its tail almost always sits at the origin.</p>
+        <div class="grid3"><div><b>🧲 Physics view</b>An arrow pointing in space. Same length and direction means the same vector.</div>
+        <div><b>💻 Computer science view</b>An ordered list of numbers, e.g. a house as [square feet; price]. Order matters.</div>
+        <div><b>📐 Maths view</b>Anything you can sensibly <i>add</i> and <i>multiply by a number</i>. More on this in the next two missions.</div></div>
+        <p>The real power is switching between views: the arrow helps you <i>see</i> it, and the list lets a computer <i>calculate</i> it.</p>`));
+      complete();
+    }
+  }
+  round();
+}
+
+/* Mission 3: vector addition */
+function m3({b,body,complete}){
+  const A=[1,2],B=[3,-1],SUM=[4,1];
+  body.append(h('p',{class:'story'},`The robot gets two commands in a row: <b style="color:${C.accent}">A</b> = ${vec(...A)} and then <b style="color:${C.accent2}">B</b> = ${vec(...B)}. Each command starts from wherever the last one ended, which is called <b>tip to tail</b>.`));
+  const rb=robot(b,[0,0]);parcel(b,SUM);
+  const s1=h('div',{class:'step'},'<div class="q">Step 1: Run A, then B, and watch the path.</div>');
+  const runAB=btn('▶ Run A then B',async()=>{runAB.disabled=true;await walk(b,rb,A,'accent',{label:'A'});await walk(b,rb,SUM,'accent2',{label:'B'});pulse(b,SUM);step2()},'primary');
+  s1.append(runAB);body.append(s1);
+  function step2(){
+    const s=h('div',{class:'step'},`<div class="q">Step 2: The robot walked right 1, up 2, right 3, down 1. Find <b>one</b> command that lands in the same place.</div>`);
+    const vi=vecInput(check);const go=btn('Check',check,'primary');const fb=fbBox();let wrong=0;
+    const row=h('div',{class:'inrow'});row.append(vi.el,go);s.append(row,fb);body.append(s);vi.focus();
+    function check(){
+      const a=vi.get();if(!a){setFb(fb,'info','Enter both numbers.');return}
+      b.clear('ghost');
+      if(eq(a,SUM)){
+        vi.disable(true);go.disabled=true;
+        arrow(b,[0,0],SUM,'ok',{label:'A + B',w:3.6});
+        setFb(fb,'ok',`Yes! One move, ${vec(4,1)}, gets the robot to the same spot as the two moves together.`);
+        s.append(concept('Vector addition',`<p>${vec(1,2)} + ${vec(3,-1)} = ${vec('1 + 3','2 + (−1)')} = ${vec(4,1)}</p>
+          <p>Add the <b>first</b> numbers together and the <b>second</b> numbers together. In pictures: put B's tail on A's tip, then draw one arrow from the start to the final tip.</p>
+          <p>It works just like the number line: 2 + 5 is "2 steps right, then 5 more", which is the same as 7 steps.</p>`));
+        step3();
+      }else{
+        wrong++;
+        if(inRange(a))arrow(b,[0,0],a,'bad',{dash:true,layer:'ghost',w:2.5});
+        let msg=eq(a,A)||eq(a,B)?"That's only <b>one</b> of the two moves. Combine both.":diagnose(a,SUM);
+        msg+=' (The red dashed arrow shows where your command would go.)';
+        if(wrong>=2)msg+='<br><b>Hint:</b> add all the horizontal moves (1 + 3), then all the vertical moves (2 + (−1)).';
+        setFb(fb,'bad',msg);
+      }
+    }
+  }
+  function step3(){
+    const s=h('div',{class:'step'},'<div class="q">Step 3: Predict first. What if the robot runs <b>B first, then A</b>?</div>');
+    const fb=fbBox();const opts=h('div',{class:'opts'});
+    const choices=[['It lands in the same place',true],['It lands somewhere different',false]];
+    choices.forEach(([t,ok])=>{const bt=h('button',{class:'opt',onclick:async()=>{
+      [...opts.children].forEach(c=>c.disabled=true);setFb(fb,'info','Running B, then A…');
+      place(rb,[0,0]);await walk(b,rb,B,'accent2',{dash:true});await walk(b,rb,SUM,'accent',{dash:true});pulse(b,SUM);
+      bt.classList.add(ok?'right':'wrong');
+      setFb(fb,ok?'ok':'bad',(ok?'Correct! ':'It actually lands in the same place. ')+'Order does not matter: A + B = B + A. The two paths form a <b>parallelogram</b> with the sum as its diagonal.');
+      complete();
+    }},t);opts.append(bt)});
+    s.append(opts,fb);body.append(s);
+  }
+}
+
+/* Mission 4: scalar multiplication */
+function m4({b,body,complete}){
+  const v=[2,1];const tasks=[[4,2],[1,0.5],[-2,-1]];let i=0;
+  body.append(h('p',{class:'story'},`This robot only knows one direction, <b>v</b> = ${vec(...v)}. Before you send it, you can multiply it by a number <b>k</b>. Stretching, shrinking or flipping a vector like this is called <b>scaling</b>, and k is called a <b>scalar</b>.`));
+  const rb=robot(b,[0,0]);
+  const s=h('div',{class:'step'});body.append(s);
+  const q=h('div',{class:'q'});const sl=h('input',{type:'range',min:'-2',max:'3',step:'0.5',value:'1','aria-label':'scalar k'});
+  const kv=h('span',{class:'kval'});const res=h('p',{class:'muted'});const send=btn('▶ Send k·v',go,'primary');const fb=fbBox();
+  const row=h('div',{class:'slider'},'<span class="kval">k =</span>');row.append(sl,kv);
+  s.append(q,row,res,send,fb);
+  function preview(){const k=parseFloat(sl.value);kv.textContent=fmt(k);const t=[k*v[0],k*v[1]];
+    res.innerHTML=`k·v = ${fmt(k)} × ${vec(...v)} = ${vec(...t)}`;
+    b.clear('ghost');arrow(b,[0,0],v,'muted',{layer:'ghost',w:2,op:.6,label:'v'});arrow(b,[0,0],t,'accent',{dash:true,layer:'ghost',w:2.5,op:.8})}
+  sl.addEventListener('input',preview);
+  function task(){b.clear('items','arrows');place(rb,[0,0]);const t=tasks[i];parcel(b,t);
+    q.innerHTML=`Task ${i+1} of ${tasks.length}: choose k so that k·v reaches the parcel at (${fmt(t[0])}, ${fmt(t[1])}), then send it.`;
+    sl.disabled=false;send.disabled=false;fb.className='fb';preview()}
+  async function go(){
+    const k=parseFloat(sl.value),t=tasks[i],ck=t[0]/v[0],end=[k*v[0],k*v[1]];
+    sl.disabled=true;send.disabled=true;b.clear('arrows');place(rb,[0,0]);
+    if(k!==0)await walk(b,rb,end,'accent',{label:fmt(k)+'v'});
+    if(k===ck){
+      pulse(b,t);
+      const what=k>1?'stretched it to '+k+' times as long':k>0?'shrank it to '+fmt(k)+' of its length':'flipped it around (same length, opposite direction)';
+      setFb(fb,'ok',`Delivered! k = ${fmt(k)} ${what}.`);
+      await sleep(900);
+      if(i<tasks.length-1){i++;task()}
+      else{
+        s.append(concept('Scalar multiplication',`<p>Multiply <b>each number</b> in the vector by the scalar: k·${vec('a','b')} = ${vec('k·a','k·b')}</p>
+          <p>k = 2 stretches the vector to twice as long. k = ½ shrinks it to half. A negative k, like −1, first <b>flips</b> the vector around and then scales it.</p>
+          <p>Adding vectors (Mission 3) and scaling them (here) are the two basic operations that all of linear algebra is built on.</p>`));
+        complete();
+      }
+    }else{
+      let msg;
+      if(k===0)msg="k = 0 squashes the arrow to nothing, so the robot doesn't move at all.";
+      else if(k===-ck)msg='Right length, wrong direction! A negative scalar <b>flips</b> the arrow.';
+      else if(Math.sign(k)!==Math.sign(ck))msg='Wrong direction. Should the arrow point along v or opposite to it?';
+      else if(Math.abs(k)>Math.abs(ck))msg='Overshot: the arrow is too long. Try a smaller k.';
+      else msg='Too short. Stretch the arrow more.';
+      setFb(fb,'bad',msg);await sleep(700);place(rb,[0,0]);b.clear('arrows');sl.disabled=false;send.disabled=false;
+    }
+  }
+  task();
+}
+
+/* Mission 5: position vs displacement */
+function m5({b,body,complete}){
+  const start=[1,1],target=[3,2],old=[3,2],fix=[2,1];
+  body.append(h('p',{class:'story'},'This morning the robot is charging at (1, 1) instead of the origin. The parcel is at (3, 2), the same spot as yesterday.'));
+  body.append(h('div',{class:'note'},`📝 Note left by yesterday's operator: "Command ${vec(...old)} reaches the parcel."`));
+  const rb=robot(b,start);parcel(b,target);
+  const s1=h('div',{class:'step'},`<div class="q">Predict first: will ${vec(...old)} still reach the parcel?</div>`);
+  const fb1=fbBox();const opts=h('div',{class:'opts'});
+  [['Yes, the parcel hasn\'t moved',false],['No, something has changed',true]].forEach(([t,ok])=>{
+    const bt=h('button',{class:'opt',onclick:async()=>{
+      [...opts.children].forEach(c=>c.disabled=true);bt.classList.add(ok?'right':'wrong');
+      setFb(fb1,'info','Running the old command…');
+      await walk(b,rb,[start[0]+old[0],start[1]+old[1]],'bad',{label:'old'});
+      setFb(fb1,ok?'ok':'bad',(ok?'Good instinct! ':'Missed! ')+`The robot ended at (4, 3). A command is a <b>movement</b>, so it starts from wherever the robot is. Yesterday the robot started at the origin; today it starts at (1, 1).`);
+      step2();
+    }},t);opts.append(bt)});
+  s1.append(opts,fb1);body.append(s1);
+  function step2(){
+    const s=h('div',{class:'step'},'<div class="q">Fix it: what command takes the robot from (1, 1) to the parcel at (3, 2)?</div>');
+    const vi=vecInput(check);const go=btn('Check & run',check,'primary');const fb=fbBox();let wrong=0,busy=false;
+    const row=h('div',{class:'inrow'});row.append(vi.el,go);s.append(row,fb);body.append(s);vi.focus();
+    async function check(){
+      if(busy)return;const a=vi.get();if(!a){setFb(fb,'info','Enter both numbers.');return}
+      busy=true;go.disabled=true;b.clear('arrows','ghost');place(rb,start);
+      const end=[start[0]+a[0],start[1]+a[1]];
+      if(eq(a,fix)){
+        vi.disable(true);
+        await walk(b,rb,target,'ok',{label:'movement'});pulse(b,target);
+        arrow(b,[0,0],start,'muted',{w:2.2,label:'start'});arrow(b,[0,0],target,'accent2',{w:2.2,dash:true,label:'target'});
+        setFb(fb,'ok',`Fixed! ${vec(2,1)} moves the robot 2 right and 1 up.`);
+        s.append(concept('Position vs movement',`<p>A <b>position</b> is an arrow from the origin to a point. A <b>movement</b> (displacement) is an arrow from one point to another.</p>
+          <p><b>movement = target − start</b> = ${vec(3,2)} − ${vec(1,1)} = ${vec(2,1)}</p>
+          <p>Check it with addition: start + movement = ${vec(1,1)} + ${vec(2,1)} = ${vec(3,2)} ✓ (grey + green = blue dashed on the grid)</p>`));
+        complete();
+      }else{
+        wrong++;
+        if(inRange(end))await walk(b,rb,end,'bad',{dash:true});
+        let msg=diagnose(a,fix,target);if(wrong>=2)msg+='<br><b>Hint:</b> from (1, 1), how many squares right to reach x = 3? How many up to reach y = 2?';
+        setFb(fb,'bad',msg);await sleep(600);place(rb,start);b.clear('arrows');go.disabled=false;busy=false;
+      }
+    }
+  }
+}
+
+/* Mission 6: independent challenge */
+function m6({b,body,complete}){
+  const rounds=3;let r=0,firstTry=0;
+  body.append(h('p',{class:'story'},'No hints this time, until you need one. The robot and parcel start in a new place every round. Send the command that delivers the parcel.'));
+  const area=h('div');body.append(area);let rb=null;
+  function make(){let s,t;do{s=[ri(-4,4),ri(-4,4)];t=[ri(-4,4),ri(-4,4)]}while(eq(s,t)||eq(s,[0,0])||(s[0]===t[0]&&s[1]===t[1]));return[s,t]}
+  function round(){
+    const [s0,t]=make(),need=[t[0]-s0[0],t[1]-s0[1]];
+    b.clear('items','arrows','ghost','robot');rb=robot(b,s0);parcel(b,t);area.innerHTML='';
+    const s=h('div',{class:'step'},`<div class="q">Round ${r+1} of ${rounds}: the robot is at (${fmt(s0[0])}, ${fmt(s0[1])}) and the parcel is at (${fmt(t[0])}, ${fmt(t[1])}). What's the command?</div>`);
+    const vi=vecInput(check);const go=btn('Send',check,'primary');const fb=fbBox();let wrong=0,busy=false;
+    const row=h('div',{class:'inrow'});row.append(vi.el,go);s.append(row,fb);area.append(s);vi.focus();
+    async function check(){
+      if(busy)return;const a=vi.get();if(!a){setFb(fb,'info','Enter both numbers.');return}
+      busy=true;go.disabled=true;b.clear('arrows');place(rb,s0);
+      if(eq(a,need)){
+        if(wrong===0)firstTry++;vi.disable(true);
+        await walk(b,rb,t,'ok');pulse(b,t);
+        setFb(fb,'ok',`Delivered! ${vec(...t)} − ${vec(...s0)} = ${vec(...need)}`);
+        await sleep(400);
+        if(r<rounds-1)s.append(btn('Next round →',()=>{r++;round()},'primary'));else finale();
+      }else{
+        wrong++;const end=[s0[0]+a[0],s0[1]+a[1]];
+        if(inRange(end))await walk(b,rb,end,'bad',{dash:true});
+        let msg=diagnose(a,need,t);if(wrong>=2)msg+=`<br><b>Hint:</b> target − start = ${vec(fmt(t[0])+' − ('+fmt(s0[0])+')',fmt(t[1])+' − ('+fmt(s0[1])+')')}`;
+        setFb(fb,'bad',msg);await sleep(600);place(rb,s0);b.clear('arrows');go.disabled=false;busy=false;
+      }
+    }
+  }
+  function finale(){
+    area.append(h('p',{class:'score'},`Delivered on the first try: ${firstTry} of ${rounds}`));
+    mcq(area,'Explain it: why did yesterday\'s command fail in Mission 5?',[
+      {t:'The parcel had moved',why:"The parcel was at (3, 2) both days. Look at what changed instead."},
+      {t:'A command is a movement, and it starts from wherever the robot is',ok:true,why:'Exactly. A vector describes a movement, not a fixed place. Same command, different start, different end.'},
+      {t:'Vectors only work when they start at the origin',why:'Arrows are usually <i>drawn</i> from the origin, but a movement can start anywhere, which is how tip-to-tail addition works.'}
+    ],()=>{
+      mcq(area,'Level up to 3D: a drone flies around a room that has a height too. How many numbers does its command vector need?',[
+        {t:'2 numbers',why:'Two numbers only cover x and y. What about up/down in the room?'},
+        {t:'3 numbers: x, y and z',ok:true,why:`Right. Add a z-axis perpendicular to x and y, and each vector becomes an ordered triplet like ${vec('2','1')} → <span class="vec"><span>2</span><span>1</span><span>3</span></span>. Every triplet gives exactly one vector in 3D space.`},
+        {t:'4 numbers',why:'Space around us has three directions. Which ones?'}
+      ],()=>{
+        area.append(concept('🎉 Lab complete! You can now…',`<ul class="done-list">
+          <li>Read and write a vector's <b>coordinates</b> (top = x, bottom = y)</li>
+          <li>See a vector as an <b>arrow</b>, a <b>list of numbers</b> and something you can add and scale</li>
+          <li><b>Add</b> vectors tip-to-tail and by adding matching entries</li>
+          <li><b>Scale</b> vectors: stretch, shrink and flip</li>
+          <li>Find a <b>movement</b> as target − start</li>
+          <li>Extend all of this to <b>3D</b></li></ul>
+          <p>Next up: Chapter 2, <i>linear combinations, span and basis vectors</i>. What can you reach by mixing scaled vectors together?</p>`));
+        complete();
+      });
+    });
+  }
+  round();
+}
+
+/* ---------- shell ---------- */
+const app=document.getElementById('app'),nav=document.getElementById('nav'),bar=document.getElementById('bar');
+let done=new Set();try{done=new Set(JSON.parse(localStorage.getItem('vlab1-done')||'[]'))}catch(e){}
+function save(){try{localStorage.setItem('vlab1-done',JSON.stringify([...done]))}catch(e){}}
+let current=0;while(done.has(current)&&current<missions.length-1)current++;
+const unlocked=i=>i===0||done.has(i-1)||done.has(i);
+function renderNav(){
+  nav.innerHTML='';
+  missions.forEach((m,i)=>{const bt=h('button',{class:i===current?'cur':'',onclick:()=>{current=i;render()}},
+    `<span class="st">${done.has(i)?'✅':unlocked(i)?'▶':'🔒'}</span>${i+1}. ${m.title}`);bt.disabled=!unlocked(i);nav.append(bt)});
+  bar.style.width=(done.size/missions.length*100)+'%';
+}
+function render(){
+  renderNav();const m=missions[current];app.innerHTML='';
+  const left=h('div',{class:'card board'}),right=h('div',{class:'card'});app.append(left,right);
+  const b=makeBoard();left.append(b.svg);
+  left.append(h('div',{class:'legend'},'<span><i class="dot r"></i>Robot</span><span><i class="dot p"></i>Parcel</span><span>1 square = 1 m · right = +x · up = +y</span>'));
+  right.append(h('div',{class:'mhead'},`<span class="num">Mission ${current+1} of ${missions.length}</span><span class="chip">${m.concept}</span><span class="chip t">🎬 ${m.time}</span>`));
+  right.append(h('h2',{},m.title));
+  const body=h('div');right.append(body);
+  let finished=false;
+  m.build({b,body,complete:()=>{
+    if(finished)return;finished=true;done.add(current);save();renderNav();
+    const nx=h('div',{class:'next'});
+    if(current<missions.length-1)nx.append(btn('Next mission →',()=>{current++;render();window.scrollTo({top:0,behavior:'smooth'})},'primary'));
+    nx.append(btn('↺ Replay this mission',()=>render()));
+    body.append(nx);
+  }});
+}
+render();
+</script>
+</body>
+</html>
