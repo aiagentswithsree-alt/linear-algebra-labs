@@ -10,6 +10,7 @@ Each lab turns one chapter into short missions: **see the problem → predict �
 | 1 | [Vectors](ch01-vectors/index.html) | Coordinates, vectors as arrows and lists, vector addition, scalar multiplication, position vs movement, 3D |
 | 2 | [Span & basis](ch02-span/index.html) | Basis vectors î and ĵ, changing basis, linear combinations, span in 2D and 3D, linear dependence, definition of a basis |
 | 3 | [Transformations & matrices](ch03-transformations/index.html) | Transformations as movement, linearity test, where î and ĵ land, matrix–vector multiplication, rotation, shear, squishing onto a line |
+| 4 | [Composition](ch04-composition/index.html) | Composition of transformations, matrix product read right to left, columns of a product, AB ≠ BA, associativity |
 
 ## How to use
 
@@ -45,4 +46,14 @@ Progress is saved in your browser.
 6. **Read a matrix**: matrix → picture, and dependent columns squish space (8:55–9:44)
 7. **Prove it**: random matrix × vector rounds and a reverse round (whole video)
 
-Source videos: 3Blue1Brown's *Essence of linear algebra* series, chapters 1–3 ([playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)).
+## Chapter 4 missions
+
+1. **Warm-up**: recap of matrices as transformations (video 0:10–1:58)
+2. **One move, then another**: rotate then shear, read the composition matrix (2:01–2:52)
+3. **Long way vs short way**: S(Rv) = (SR)v, read products right to left (3:03–4:25)
+4. **Multiply without watching**: follow î and ĵ through M₁ then M₂ (4:31–5:56)
+5. **The general rule**: each column of AB is A × (column of B) (5:56–7:19)
+6. **Does order matter?**: shear/rotate both ways, AB ≠ BA (7:28–8:12)
+7. **Parentheses & challenge**: why (AB)C = A(BC), plus random products (8:21–9:42)
+
+Source videos: 3Blue1Brown's *Essence of linear algebra* series, chapters 1–4 ([playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)).
