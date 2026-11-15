@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vector Lab — Chapter 3: Linear Transformations and Matrices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6fb;--card:#ffffff;--ink:#1d2433;--muted:#5d6678;--line:#e3e6ee;
+  --accent:#4f46e5;--accent2:#0ea5e9;--parcel:#f59e0b;--ok:#15803d;--bad:#b91c1c;
+  --okbg:#ecfdf3;--badbg:#fef2f2;--infobg:#eef2ff;--ihat:#16a34a;--jhat:#dc2626;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;font-size:15px}
+header{max-width:1120px;margin:0 auto;padding:22px 24px 6px}
+.crumb{font-size:13px;margin-bottom:6px}
+h1{font-size:22px;margin:0 0 2px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.loop{display:inline-flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.loop span{font-size:12px;font-weight:600;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.progress{max-width:1120px;margin:14px auto 0;padding:0 24px}
+.bar{height:6px;background:#e6e8f0;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .5s}
+nav{max-width:1120px;margin:10px auto 0;padding:0 24px;display:flex;gap:8px;flex-wrap:wrap}
+nav button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:7px 12px;cursor:pointer;display:flex;gap:6px;align-items:center}
+nav button[disabled]{opacity:.45;cursor:not-allowed}
+nav button.cur{border-color:var(--accent);box-shadow:0 0 0 3px #e0e7ff}
+main{max-width:1120px;margin:16px auto 48px;padding:0 24px;display:grid;grid-template-columns:minmax(300px,470px) 1fr;gap:20px;align-items:start}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.board{position:sticky;top:12px}
+@media(max-width:860px){.board{position:static}}
+svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.sw{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:5px;vertical-align:2px}
+.mhead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.num{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.chip{font-size:12px;background:var(--infobg);color:var(--accent);border-radius:999px;padding:2px 9px;font-weight:600}
+.chip.t{background:#f1f5f9;color:var(--muted)}
+h2{font-size:20px;margin:6px 0 8px}
+.story{color:#374151;margin:0 0 12px}
+.step{border-top:1px dashed var(--line);padding-top:12px;margin-top:12px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.q{font-weight:600;margin-bottom:8px}
+.muted{color:var(--muted);font-size:14px}
+.btn{font:inherit;font-weight:600;font-size:14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;cursor:pointer;margin:4px 6px 4px 0}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:not(:disabled):hover{filter:brightness(.96)}
+.inrow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:6px 0}
+label.f{display:flex;flex-direction:column;font-size:13px;color:var(--muted);gap:4px}
+input[type=number]{font:inherit;font-family:'JetBrains Mono',monospace;font-size:16px;width:76px;padding:7px 9px;border:1.5px solid #cbd2e1;border-radius:9px;text-align:center}
+input[type=number]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px #e0e7ff}
+.vec{display:inline-flex;flex-direction:column;align-items:center;font-family:'JetBrains Mono',monospace;font-weight:700;line-height:1.25;padding:1px 7px;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:4px;vertical-align:middle;margin:0 3px;font-size:14px}
+.mat{display:inline-grid;grid-template-columns:auto auto;column-gap:12px;font-family:'JetBrains Mono',monospace;font-weight:700;line-height:1.25;padding:1px 8px;border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-radius:4px;vertical-align:middle;margin:0 3px;font-size:14px;text-align:center}
+.matin{display:inline-grid;grid-template-columns:auto auto;gap:6px;padding:6px 8px;border-left:2.5px solid var(--ink);border-right:2.5px solid var(--ink);border-radius:6px;vertical-align:middle}
+.matin input{width:64px}
+.matin input.c1{border-color:#86efac}.matin input.c2{border-color:#fca5a5}
+.fb{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14px;display:none}
+.fb.ok{display:block;background:var(--okbg);color:#14532d;border:1px solid #bbf7d0}
+.fb.bad{display:block;background:var(--badbg);color:#7f1d1d;border:1px solid #fecaca}
+.fb.info{display:block;background:var(--infobg);color:#312e81;border:1px solid #c7d2fe}
+.concept{background:linear-gradient(180deg,#f8f9ff,#fff);border:1px solid #c7d2fe;border-radius:12px;padding:12px 14px;margin-top:12px}
+.concept h3{margin:0 0 6px;font-size:15px;color:var(--accent)}
+.concept p{margin:6px 0}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{font:inherit;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:14px}
+.opt:not(:disabled):hover{border-color:#a5b4fc}
+.opt.right{border-color:#86efac;background:var(--okbg)}
+.opt.wrong{border-color:#fca5a5;background:var(--badbg)}
+.readout{font-size:14px;margin:6px 0 4px}
+.next{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.score{font-size:13px;color:var(--muted)}
+.done-list{margin:8px 0 0;padding-left:20px}
+.done-list li{margin:3px 0}
+.ih{color:var(--ihat);font-weight:700}.jh{color:var(--jhat);font-weight:700}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="crumb"><a href="../">← All chapters</a></div>
+  <h1>Vector Lab · Chapter 3: Linear transformations and matrices</h1>
+  <p class="sub">Grab the whole grid and move it. Discover that four numbers, where î and ĵ land, describe the entire move. That's a matrix.</p>
+  <div class="loop"><span>1 · See the problem</span><span>2 · Predict</span><span>3 · Try it</span><span>4 · Learn the maths</span></div>
+</header>
+<div class="progress"><div class="bar"><i id="bar"></i></div></div>
+<nav id="nav"></nav>
+<main id="app"></main>
+
+<script>
+/* ---------- constants & helpers ---------- */
+const S=40,O=220,R=5,EXT=9;
+const C={accent:'#4f46e5',accent2:'#0ea5e9',muted:'#94a3b8',bad:'#dc2626',ok:'#16a34a',parcel:'#f59e0b',ihat:'#16a34a',jhat:'#dc2626',v:'#f59e0b'};
+const NS='http://www.w3.org/2000/svg';
+const P=(x,y)=>[O+S*x,O-S*y];
+const near=(a,b)=>Math.abs(a-b)<1e-9;
+const eq=(a,b)=>a&&b&&a.length===b.length&&a.every((x,i)=>near(x,b[i]));
+const fmt=n=>{if(typeof n==='string')return n;n=Math.round(n*1000)/1000;if(Object.is(n,-0))n=0;const s=String(Math.abs(n));return n<0?'−'+s:s};
+const sc=n=>n<0?`(${fmt(n)})`:fmt(n);
+const vec=(...xs)=>`<span class="vec">${xs.map(x=>`<span>${fmt(x)}</span>`).join('')}</span>`;
+const mat=M=>`<span class="mat"><span class="ih">${fmt(M[0])}</span><span class="jh">${fmt(M[1])}</span><span class="ih">${fmt(M[2])}</span><span class="jh">${fmt(M[3])}</span></span>`;
+const lin=M=>p=>[M[0]*p[0]+M[1]*p[1],M[2]*p[0]+M[3]*p[1]];
+const apply=(M,v)=>lin(M)(v);
+const col1=M=>[M[0],M[2]],col2=M=>[M[1],M[3]];
+const lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function inRange(p){return p&&Math.abs(p[0])<=R+.01&&Math.abs(p[1])<=R+.01}
+
+function el(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function h(tag,attrs={},html=''){const e=document.createElement(tag);for(const k in attrs){if(k==='class')e.className=attrs[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}if(html)e.innerHTML=html;return e}
+function btn(text,fn,cls=''){return h('button',{class:'btn '+cls,onclick:fn},text)}
+function fbBox(){return h('div',{class:'fb',role:'status','aria-live':'polite'})}
+function setFb(box,type,html){box.className='fb '+type;box.innerHTML=html}
+function concept(title,html){return h('div',{class:'concept'},`<h3>${title}</h3>${html}`)}
+
+/* ---------- board ---------- */
+function makeBoard(){
+  const svg=el('svg',{viewBox:'0 0 440 440',role:'img','aria-label':'Grid that can be transformed'});
+  const defs=el('defs',{},svg);
+  for(const c in C){const m=el('marker',{id:'ah-'+c,viewBox:'0 0 10 10',refX:'8.5',refY:'5',markerWidth:'5.5',markerHeight:'5.5',orient:'auto'},defs);el('path',{d:'M0,0 L10,5 L0,10 z',fill:C[c]},m)}
+  const clip=el('clipPath',{id:'room'},defs);el('rect',{x:20,y:20,width:400,height:400,rx:6},clip);
+  const grid=el('g',{},svg);
+  el('rect',{x:20,y:20,width:400,height:400,fill:'#fbfcff',rx:6},grid);
+  for(let i=-R;i<=R;i++){
+    const [x]=P(i,0),[,y]=P(0,i),ax=i===0;
+    el('line',{x1:x,y1:20,x2:x,y2:420,stroke:ax?'#cbd5e1':'#eef0f5','stroke-width':ax?1.4:1},grid);
+    el('line',{x1:20,y1:y,x2:420,y2:y,stroke:ax?'#cbd5e1':'#eef0f5','stroke-width':ax?1.4:1},grid);
+    if(i!==0){
+      el('text',{x,y:O+15,'font-size':10,fill:'#94a3b8','text-anchor':'middle'},grid).textContent=fmt(i);
+      el('text',{x:O-7,y:y+3.5,'font-size':10,fill:'#94a3b8','text-anchor':'end'},grid).textContent=fmt(i);
+    }
+  }
+  const root=el('g',{'clip-path':'url(#room)'},svg);
+  const L={world:el('g',{},root),warr:el('g',{},root),arrows:el('g',{},svg),items:el('g',{},svg),ghost:el('g',{},svg)};
+  return {svg,L,clear(...n){n.forEach(k=>L[k].innerHTML='')}};
+}
+function label(g,x1,y1,x2,y2,text,color,side=1){
+  const mx=x2-(x2-x1)*0.25,my=y2-(y2-y1)*0.25,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1;
+  const nx=-dy/len*14*side,ny=dx/len*14*side;
+  el('text',{x:mx+nx,y:my+ny+4,'font-size':13,'font-weight':700,fill:color,'text-anchor':'middle',stroke:'#fff','stroke-width':3,'paint-order':'stroke'},g).textContent=text;
+}
+function arrow(b,from,to,color='accent',o={}){
+  const [x1,y1]=P(...from),[x2,y2]=P(...to);if(Math.hypot(x2-x1,y2-y1)<2)return null;
+  const g=el('g',{},b.L[o.layer||'arrows']);
+  const a={x1,y1,x2,y2,stroke:C[color],'stroke-width':o.w||3.4,'stroke-linecap':'round','marker-end':`url(#ah-${color})`,opacity:o.op||1};
+  if(o.dash)a['stroke-dasharray']='6 5';
+  el('line',a,g);
+  if(o.label)label(g,x1,y1,x2,y2,o.label,C[color],o.side||1);
+  return g;
+}
+function dot(b,p,color,r=6,layer='ghost'){if(!inRange(p))return;const [x,y]=P(...p);el('circle',{cx:x,cy:y,r,fill:color,stroke:'#fff','stroke-width':1.5},b.L[layer])}
+function ring(b,p){if(!inRange(p))return;const [x,y]=P(...p);el('circle',{cx:x,cy:y,r:10,fill:'none',stroke:'#64748b','stroke-width':2,'stroke-dasharray':'3 3'},b.L.ghost)}
+function pulse(b,p,color=C.ok){if(!inRange(p))return;const [x,y]=P(...p);const c=el('circle',{cx:x,cy:y,r:12,fill:'none',stroke:color,'stroke-width':3},b.L.ghost);
+  el('animate',{attributeName:'r',from:12,to:30,dur:'0.8s',repeatCount:2},c);el('animate',{attributeName:'opacity',from:1,to:0,dur:'0.8s',repeatCount:2,fill:'freeze'},c)}
+function toGrid(svg,e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(svg.getScreenCTM().inverse());
+  return [Math.max(-R,Math.min(R,Math.round((p.x-O)/S))),Math.max(-R,Math.min(R,Math.round((O-p.y)/S)))]}
+
+/* ---------- the morphing world ---------- */
+const HOUSE=[[0,0],[2,0],[2,1.5],[1,2.5],[0,1.5],[0,0]];
+function world(b){
+  const W={f:p=>p,t:0,diag:false,house:false,dots:false,origin:true,basis:true,vecs:[],gridOn:true};
+  W.draw=()=>{
+    b.clear('world','warr');const t=W.t,f=W.f,g=b.L.world;
+    const map=p=>lerp(p,f(p),t);
+    const path=(pts,attrs)=>{let d='';pts.forEach((p,i)=>{const [x,y]=P(...map(p));d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)});return el('path',{d,fill:'none',...attrs},g)};
+    if(W.gridOn)for(let k=-EXT;k<=EXT;k++){
+      const v=[],hz=[];for(let s=-EXT;s<=EXT+1e-9;s+=0.25){v.push([k,s]);hz.push([s,k])}
+      const ax=k===0;const attrs={stroke:ax?'#312e81':'#6366f1','stroke-width':ax?2:1.1,'stroke-opacity':ax?.8:.5};
+      path(v,attrs);path(hz,attrs);
+    }
+    if(W.dots)for(let x=-EXT;x<=EXT;x++)for(let y=-EXT;y<=EXT;y++){const q=map([x,y]);if(inRange(q)){const [px,py]=P(...q);el('circle',{cx:px,cy:py,r:2.6,fill:'#6366f1',opacity:.75},g)}}
+    if(W.diag){const d=[];for(let s=-EXT;s<=EXT+1e-9;s+=0.1)d.push([s,s]);path(d,{stroke:C.parcel,'stroke-width':3})}
+    if(W.house){const pts=[];for(let i=0;i<HOUSE.length-1;i++)for(let s=0;s<=1.0001;s+=0.1)pts.push(lerp(HOUSE[i],HOUSE[i+1],s));
+      const pp=path(pts,{stroke:'#b45309','stroke-width':2.5,fill:'#fde68a','fill-opacity':.7});}
+    if(W.origin){const [x,y]=P(...map([0,0]));el('circle',{cx:x,cy:y,r:5,fill:'#0f172a',stroke:'#fff','stroke-width':1.5},g)}
+    if(W.basis){arrow(b,[0,0],map([1,0]),'ihat',{layer:'warr',label:'î',side:-1});arrow(b,[0,0],map([0,1]),'jhat',{layer:'warr',label:'ĵ'})}
+    W.vecs.forEach(v=>arrow(b,[0,0],map(v.v),v.color||'v',{layer:'warr',label:v.label,w:3.6}));
+  };
+  W.play=(f,ms=1500)=>new Promise(res=>{W.f=f;const t0=performance.now();
+    const step=t=>{const k=Math.min(1,(t-t0)/ms);W.t=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;W.draw();if(k<1)requestAnimationFrame(step);else res()};requestAnimationFrame(step)});
+  W.reset=()=>{W.t=0;W.draw()};
+  W.draw();return W;
+}
+
+/* ---------- UI helpers ---------- */
+function numInputs(names,onEnter){
+  const row=h('div',{class:'inrow'});const ins=names.map(n=>{const i=h('input',{type:'number',step:'0.5','aria-label':n});const l=h('label',{class:'f'},n);l.append(i);row.append(l);i.addEventListener('keydown',e=>{if(e.key==='Enter'&&onEnter)onEnter()});return i});
+  return{row,get(){const v=ins.map(i=>parseFloat(i.value));return v.some(isNaN)?null:v},disable(d){ins.forEach(i=>i.disabled=d)},focus(){ins[0].focus()}};
+}
+function vecIn(label,onEnter){
+  const row=h('div',{class:'inrow'});const l=h('label',{class:'f'},label);
+  const w=h('span',{class:'vec',style:'gap:6px;padding:6px 8px'});const a=h('input',{type:'number',step:'0.5','aria-label':'x'}),c=h('input',{type:'number',step:'0.5','aria-label':'y'});
+  [a,c].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'&&onEnter)onEnter()}));w.append(a,c);l.append(w);row.append(l);
+  return{row,get(){const x=parseFloat(a.value),y=parseFloat(c.value);return isNaN(x)||isNaN(y)?null:[x,y]},disable(d){a.disabled=c.disabled=d},focus(){a.focus()}};
+}
+function matIn(onEnter){
+  const w=h('span',{class:'matin'});const ins=['c1','c2','c1','c2'].map((c,i)=>{const x=h('input',{type:'number',step:'0.5',class:c,'aria-label':['a (î lands x)','b (ĵ lands x)','c (î lands y)','d (ĵ lands y)'][i]});x.addEventListener('keydown',e=>{if(e.key==='Enter'&&onEnter)onEnter()});w.append(x);return x});
+  return{el:w,get(){const v=ins.map(i=>parseFloat(i.value));return v.some(isNaN)?null:v},disable(d){ins.forEach(i=>i.disabled=d)},focus(){ins[0].focus()}};
+}
+function mcq(container,q,options,onRight){
+  const s=h('div',{class:'step'},`<div class="q">${q}</div>`);const opts=h('div',{class:'opts'});const fb=fbBox();
+  options.forEach(o=>{const bt=h('button',{class:'opt',onclick:()=>{
+    if(o.ok){bt.classList.add('right');[...opts.children].forEach(c=>c.disabled=true);setFb(fb,'ok',o.why);onRight&&onRight(s)}
+    else{bt.classList.add('wrong');bt.disabled=true;setFb(fb,'bad',o.why)}}},o.t);opts.append(bt)});
+  s.append(opts,fb);container.append(s);return s;
+}
+function predict(container,q,options,onPick){
+  const s=h('div',{class:'step'},`<div class="q">${q}</div>`);const opts=h('div',{class:'opts'});const fb=fbBox();
+  options.forEach((o,j)=>{const bt=h('button',{class:'opt',onclick:async()=>{[...opts.children].forEach(c=>c.disabled=true);await onPick(j,fb,bt,s)}},o);opts.append(bt)});
+  s.append(opts,fb);container.append(s);return s;
+}
+/* tip-to-tail column picture of M·v */
+async function columnPicture(b,M,v){
+  b.clear('arrows');const p1=[v[0]*M[0],v[0]*M[2]],res=apply(M,v);
+  arrow(b,[0,0],p1,'ihat',{label:`${fmt(v[0])}·(î lands)`,side:-1,w:3});await sleep(350);
+  arrow(b,p1,res,'jhat',{label:`${fmt(v[1])}·(ĵ lands)`,w:3});await sleep(350);
+  arrow(b,[0,0],res,'v',{w:3.8,label:'result'});
+}
+function mvDiag(ans,M,v){
+  const T=[M[0],M[2],M[1],M[3]];
+  if(eq(ans,v))return "That's where the vector <b>started</b>. Where does it go after the transformation?";
+  if(eq(ans,apply(T,v)))return 'You used the <b>rows</b> as the landing spots. The <b>columns</b> are where î and ĵ land: the first column is î, the second is ĵ.';
+  const r=apply(M,v);
+  if(near(ans[0],r[0]))return 'The x-part is right. Recheck the y-part.';
+  if(near(ans[1],r[1]))return 'The y-part is right. Recheck the x-part.';
+  return 'Not yet. Scale where î lands by x, scale where ĵ lands by y, then add.';
+}
+
+/* ---------- missions ---------- */
+const missions=[
+{title:'Watch space move',concept:'Transformation = function',time:'0:43–2:21',build:m1},
+{title:'Linear or not?',concept:'Lines stay lines, origin fixed',time:'2:39–3:23',build:m2},
+{title:'Follow î and ĵ',concept:'Basis vectors decide everything',time:'3:35–5:58',build:m3},
+{title:'Matrix × vector',concept:'Columns = where î, ĵ land',time:'6:04–7:48',build:m4},
+{title:'Build the matrix',concept:'Rotation and shear',time:'8:00–8:55',build:m5},
+{title:'Read a matrix',concept:'Matrix → picture, squishing',time:'8:55–9:44',build:m6},
+{title:'Prove it',concept:'Put it all together',time:'Whole video',build:m7},
+];
+
+/* Mission 1: transformation as movement */
+function m1({b,body,complete}){
+  const W=world(b);W.basis=false;const v=[3,1];W.vecs=[{v,label:'v'}];W.draw();
+  const rot=lin([0,-1,1,0]);
+  body.append(h('p',{class:'story'},'A <b>transformation</b> is just a function: a vector goes in and another vector comes out. We picture it as <b>movement</b>: the input vector moves over to become the output. This machine rotates things a quarter turn counterclockwise.'));
+  const area=h('div');body.append(area);
+  const s=h('div',{class:'step'},`<div class="q">Step 1: predict. The orange arrow v = ${vec(...v)} goes into the machine. Click the grid where its tip will end up.</div>`);
+  const pt=h('p',{class:'muted'},'No prediction yet. Click the grid.');const fb=fbBox();
+  let pred=null,clickable=true;
+  b.svg.style.cursor='crosshair';
+  b.svg.addEventListener('click',e=>{if(!clickable)return;pred=toGrid(b.svg,e);b.clear('ghost');ring(b,pred);go.disabled=false;pt.innerHTML=`Your prediction: <b>(${fmt(pred[0])}, ${fmt(pred[1])})</b>`});
+  const go=btn('▶ Run the machine',async()=>{clickable=false;go.disabled=true;b.svg.style.cursor='';
+    await W.play(rot);const out=rot(v);pulse(b,out);
+    setFb(fb,eq(pred,out)?'ok':'bad',(eq(pred,out)?'<b>Exactly right!</b> ':`It landed at <b>(${fmt(out[0])}, ${fmt(out[1])})</b>. `)+'Notice the <b>whole grid</b> turned with it. Watching every point move at once shows what the transformation does to all of space.');
+    step2()},'primary');go.disabled=true;
+  s.append(pt,go,fb);area.append(s);
+  function step2(){
+    const s2=h('div',{class:'step'},'<div class="q">Step 2: watching every arrow at once gets crowded. So think of each vector as just the <b>point at its tip</b>. Press play and watch all the points move under a different machine.</div>');
+    const fb2=fbBox();
+    const g2=btn('▶ Move every point',async()=>{g2.disabled=true;W.vecs=[];W.gridOn=false;W.dots=true;W.t=0;W.draw();await sleep(500);
+      await W.play(lin([1,1,0,1]),1800);await sleep(300);W.gridOn=true;W.draw();
+      setFb(fb2,'ok','Every dot moved to a new spot, and the purple lines show where the grid went. The light grey grid stays behind as the <b>"before" picture</b>, so you can compare where things started with where they ended up.');
+      s2.append(concept('Transformations',`<p>A <b>transformation</b> is a function that takes in a vector and outputs a vector. We see it as every point in space <b>moving</b> to a new point.</p>
+        <p>To see the whole shape of a transformation, watch a grid of points move, and keep a copy of the original grid in the background.</p>`));complete()},'primary');
+    s2.append(g2,fb2);area.append(s2);
+  }
+}
+
+/* Mission 2: linear or not */
+function m2({b,body,complete}){
+  const W=world(b);W.basis=false;
+  const specs=[
+    {name:'Machine A',f:p=>[p[0]+0.45*Math.sin(p[1]*0.9),p[1]+0.45*Math.sin(p[0]*0.9)],ans:1,why:'The grid lines got <b>curvy</b>. Straight lines must stay straight.'},
+    {name:'Machine B',f:p=>[p[0]+1.5,p[1]+1],ans:2,why:'Lines stay straight, but the <b>origin moved</b> (follow the black dot). A linear transformation keeps the origin fixed.'},
+    {name:'Machine C',f:p=>[p[0]+0.09*p[0]*p[1],p[1]],ans:1,diag:true,why:'Tricky! The horizontal and vertical lines stay straight, but the orange <b>diagonal line bends</b>. Straight lines in every direction must stay straight, so this is not linear.'},
+    {name:'Machine D',f:lin([1,1,0,1]),ans:0,why:'Lines stay straight, the origin stays put, and the grid lines stay <b>parallel and evenly spaced</b>, even the diagonal. Linear!'}
+  ];let i=0,score=0;
+  body.append(h('p',{class:'story'},'Linear algebra only studies one special kind of transformation, <b>linear</b> ones. You are the inspector. Run each machine and decide whether it is linear.'));
+  const area=h('div');body.append(area);
+  function run(){
+    const sp=specs[i];area.innerHTML='';W.f=p=>p;W.t=0;W.diag=false;W.draw();
+    const s=h('div',{class:'step'},`<div class="q">${sp.name} (${i+1} of ${specs.length}): run it and watch the purple grid and the black origin dot.</div>`);
+    const fb=fbBox();
+    const go=btn('▶ Run machine',async()=>{go.disabled=true;await W.play(sp.f);opts.style.display='flex'},'primary');
+    const opts=h('div',{class:'opts',style:'display:none;margin-top:8px'});
+    let tries=0;
+    ['Linear','Not linear: lines get curved','Not linear: the origin moves'].forEach((t,j)=>{const bt=h('button',{class:'opt',onclick:async()=>{
+      tries++;
+      if(j===sp.ans){bt.classList.add('right');[...opts.children].forEach(c=>c.disabled=true);if(tries===1)score++;
+        if(sp.diag&&!W.diag){W.diag=true;W.t=0;W.draw();await W.play(sp.f)}
+        setFb(fb,'ok','<b>Correct.</b> '+sp.why);
+        if(i<specs.length-1)s.append(btn('Next machine →',()=>{i++;run()},'primary'));
+        else{s.append(h('p',{class:'score'},`Right on the first try: ${score} of ${specs.length}`));
+          s.append(concept('What makes a transformation linear',`<p>Visually, a transformation is <b>linear</b> if:</p><p>1. All lines stay lines, with no curving.<br>2. The origin stays fixed in place.</p>
+          <p>A handy way to check: the grid lines stay <b>parallel and evenly spaced</b>. Rotations about the origin and shears are linear.</p>`));complete()}
+      }else{bt.classList.add('wrong');bt.disabled=true;
+        if(sp.diag&&j===0){W.diag=true;W.t=0;W.draw();setFb(fb,'bad','Looks linear with only horizontal and vertical lines… Now watch an orange <b>diagonal line</b> go through the same machine.');await W.play(sp.f)}
+        else setFb(fb,'bad',j===0?'Look again: did every line stay straight, and did the black origin dot stay put?':'Check that reason again: replay it in your head and watch the lines and the dot.')}
+    }},t);opts.append(bt)});
+    s.append(go,opts,fb);area.append(s);
+  }
+  run();
+}
+
+/* Mission 3: follow i-hat and j-hat */
+function m3({b,body,complete}){
+  const M=[1,3,-2,0],v=[-1,2];const W=world(b);W.vecs=[{v,label:'v'}];W.draw();
+  body.append(h('p',{class:'story'},`Suppose you are programming animations and need a <b>formula</b>: give it a vector and it tells you where that vector lands. Amazingly, you only need to record where <span class="ih">î</span> and <span class="jh">ĵ</span> land. Here v = ${vec(...v)}, which means v = −1·î + 2·ĵ.`));
+  const area=h('div');body.append(area);
+  const s=h('div',{class:'step'},'<div class="q">Step 1: run the transformation, but this time v hides. Watch where î and ĵ land.</div>');
+  const fb=fbBox();
+  const go=btn('▶ Run',async()=>{go.disabled=true;W.vecs=[];await W.play(lin(M));
+    arrow(b,[0,0],col1(M),'ihat',{label:'î → (1, −2)',side:-1,layer:'items'});arrow(b,[0,0],col2(M),'jhat',{label:'ĵ → (3, 0)',layer:'items'});
+    setFb(fb,'info','î landed on (1, −2) and ĵ landed on (3, 0).');step2()},'primary');
+  s.append(go,fb);area.append(s);
+  function step2(){
+    const s2=h('div',{class:'step'},`<div class="q">Step 2: v started as −1·î + 2·ĵ. The grid stayed parallel and evenly spaced. So where did v land?</div>`);
+    const vi=vecIn('v lands at',check);const chk=btn('Check',check,'primary');vi.row.append(chk);const fb2=fbBox();s2.append(vi.row,fb2);area.append(s2);vi.focus();let wrong=0;
+    async function check(){const a=vi.get();if(!a){setFb(fb2,'info','Enter both numbers.');return}
+      b.clear('ghost');dot(b,a,'#94a3b8');
+      if(eq(a,[5,2])){vi.disable(true);chk.disabled=true;await columnPicture(b,M,v);W.vecs=[{v,label:'v'}];W.draw();pulse(b,[5,2]);
+        setFb(fb2,'ok',`Yes! −1·${vec(1,-2)} + 2·${vec(3,0)} = ${vec(-1,2)} + ${vec(6,0)} = ${vec(5,2)}. v started as −1·î + 2·ĵ and landed on <b>the same combination</b> of where î and ĵ landed.`);step3()}
+      else{wrong++;let m=mvDiag(a,M,v);if(wrong>=2)m+='<br><b>Hint:</b> −1 × (1, −2) + 2 × (3, 0).';setFb(fb2,'bad',m)}}
+  }
+  function step3(){
+    mcq(area,'Step 3: now any vector (x, y), meaning x·î + y·ĵ. Where does it land under this transformation?',[
+      {t:'(1x + 3y, −2x + 0y)',ok:true,why:'Right: x·(1, −2) + y·(3, 0) = (1x + 3y, −2x + 0y). Give me any vector and this formula says where it lands, <b>without watching the animation</b>.'},
+      {t:'(1x − 2y, 3x + 0y)',why:'That mixes up which numbers go together. x scales the <i>whole</i> vector where î lands, (1, −2).'},
+      {t:'(x + 1, y − 2)',why:'That just shifts every point, which would move the origin. Scale and add instead.'}
+    ],(s)=>{s.append(concept('Four numbers describe it all',`<p>A vector that starts as x·î + y·ĵ lands on <b>x·(where î lands) + y·(where ĵ lands)</b>.</p>
+      <p>So a 2D linear transformation is completely described by <b>just four numbers</b>: the two coordinates where î lands and the two where ĵ lands.</p>`));complete()});
+  }
+}
+
+/* Mission 4: matrix-vector multiplication */
+function m4({b,body,complete}){
+  const W=world(b);
+  const tasks=[{M:[2,-1,1,1],v:[1,2]},{M:[0,2,-1,1],v:[3,-1]}];let i=0;
+  body.append(h('p',{class:'story'},`We package the four numbers into a <b>2×2 matrix</b>. The <span class="ih">first column</span> is where î lands and the <span class="jh">second column</span> is where ĵ lands. To transform a vector: scale the columns by the vector's coordinates, then add.`));
+  const area=h('div');body.append(area);
+  function task(){
+    const {M,v}=tasks[i];area.innerHTML='';b.clear('arrows','ghost','items');W.f=p=>p;W.t=0;W.vecs=[{v,label:'v'}];W.draw();
+    const s=h('div',{class:'step'},`<div class="q">Task ${i+1} of ${tasks.length}: compute ${mat(M)} ${vec(...v)}</div>
+      <p class="muted">Here î lands on ${vec(...col1(M))} and ĵ lands on ${vec(...col2(M))}. Work it out, then the grid will move to check.</p>`);
+    const vi=vecIn('Result',check);const go=btn('Check',check,'primary');vi.row.append(go);const fb=fbBox();s.append(vi.row,fb);area.append(s);vi.focus();let wrong=0;
+    async function check(){const a=vi.get();if(!a){setFb(fb,'info','Enter both numbers.');return}
+      const r=apply(M,v);b.clear('ghost');
+      if(eq(a,r)){vi.disable(true);go.disabled=true;setFb(fb,'info','Correct! Watch it happen…');await W.play(lin(M));await columnPicture(b,M,v);pulse(b,r);
+        setFb(fb,'ok',`${fmt(v[0])}·${vec(...col1(M))} + ${sc(v[1])}·${vec(...col2(M))} = ${vec(...r)}. The transformed v lands exactly there.`);
+        if(i<tasks.length-1)s.append(btn('Next task →',()=>{i++;task()},'primary'));
+        else{s.append(concept('Matrix–vector multiplication',`<p>${mat(['a','b','c','d'])} ${vec('x','y')} = x·${vec('a','c')} + y·${vec('b','d')} = ${vec('ax + by','cx + dy')}</p>
+          <p>You could memorise the right-hand side. But it's easier to remember: <b>columns are where the basis vectors land</b>, and the result is the matching linear combination of them.</p>`));complete()}}
+      else{wrong++;dot(b,a,'#94a3b8');let m=mvDiag(a,M,v);if(wrong>=2)m+=`<br><b>Hint:</b> ${fmt(v[0])}·${vec(...col1(M))} + ${sc(v[1])}·${vec(...col2(M))}`;setFb(fb,'bad',m)}}
+  }
+  task();
+}
+
+/* Mission 5: build matrices by placing i-hat and j-hat */
+function m5({b,body,complete}){
+  const W=world(b);W.house=true;W.draw();
+  const tasks=[
+    {name:'Rotate all of space 90° counterclockwise.',M:[0,-1,1,0],
+      diag:M=>eq(M,[0,1,-1,0])?'That turns space <b>clockwise</b>. Counterclockwise is the other way, like turning from 3 o\'clock to 12 o\'clock.':null},
+    {name:'Shear: the x-axis stays put, and the grid leans to the right so the point (0, 1) slides over to (1, 1).',M:[1,1,0,1],
+      diag:M=>eq(M,[1,0,1,1])?'That leans the grid <b>up</b>, not to the right. î should stay where it is.':null}
+  ];let i=0;
+  body.append(h('p',{class:'story'},'Now build the matrices yourself. Click the grid to choose where <span class="ih">î</span> lands, then click again for <span class="jh">ĵ</span>. The matrix fills itself in. Then test it and watch the yellow house.'));
+  const area=h('div');body.append(area);
+  let clickable=false,stage=0,ci=[1,0],cj=[0,1],readout,go,fbx;
+  b.svg.style.cursor='crosshair';
+  b.svg.addEventListener('click',e=>{if(!clickable)return;const p=toGrid(b.svg,e);if(stage===0){ci=p;stage=1}else{cj=p;stage=0}show()});
+  function show(){b.clear('items');arrow(b,[0,0],ci,'ihat',{layer:'items',label:'î lands',side:-1,op:.75,dash:true});arrow(b,[0,0],cj,'jhat',{layer:'items',label:'ĵ lands',op:.75,dash:true});
+    readout.innerHTML=`Your matrix: ${mat([ci[0],cj[0],ci[1],cj[1]])} <span class="muted">· next click sets <b class="${stage===0?'ih':'jh'}">${stage===0?'î':'ĵ'}</b></span>`;go.disabled=false}
+  function task(){
+    const tk=tasks[i];area.innerHTML='';b.clear('items','ghost','arrows');W.f=p=>p;W.t=0;W.draw();ci=[1,0];cj=[0,1];stage=0;clickable=true;
+    const s=h('div',{class:'step'},`<div class="q">Task ${i+1} of ${tasks.length}: ${tk.name}</div>`);
+    readout=h('p',{class:'readout'});go=btn('▶ Test my matrix',test,'primary');fbx=fbBox();
+    const rs=btn('↺ Reset grid',()=>{W.f=p=>p;W.t=0;W.draw();clickable=true;go.disabled=false});
+    s.append(readout,go,rs,fbx);area.append(s);show();
+    let wrong=0;
+    async function test(){
+      const M=[ci[0],cj[0],ci[1],cj[1]];clickable=false;go.disabled=true;b.clear('items');W.t=0;await W.play(lin(M));
+      if(eq(M,tk.M)){setFb(fbx,'ok',`Perfect: ${mat(M)}. Columns ${vec(...col1(M))} and ${vec(...col2(M))} are where î and ĵ land.`);
+        if(i<tasks.length-1)s.append(btn('Next task →',()=>{i++;task()},'primary'));
+        else{s.append(concept('Two famous matrices',`<p><b>90° rotation</b> (counterclockwise): î lands on (0, 1) and ĵ lands on (−1, 0), so the matrix is ${mat([0,-1,1,0])}.</p>
+          <p><b>Shear</b>: î stays at (1, 0) and ĵ moves to (1, 1), so the matrix is ${mat([1,1,0,1])}.</p>
+          <p>To transform any vector under these, just multiply the matrix by it.</p>`));complete()}}
+      else{wrong++;let m=tk.diag(M)||'Not quite. Compare the house with what the task describes.';if(wrong>=2)m+=`<br><b>Hint:</b> î should land on (${fmt(tk.M[0])}, ${fmt(tk.M[2])}).`;
+        setFb(fbx,'bad',m+' Press <b>Reset grid</b>, click new landing spots and test again.');go.disabled=true}
+    }
+  }
+  task();
+}
+
+/* Mission 6: read a matrix */
+function m6({b,body,complete}){
+  const W=world(b);W.house=true;W.draw();const M=[1,3,2,1];
+  body.append(h('p',{class:'story'},`Now go the other way. Someone hands you ${mat(M)}. What does it do to space? Read the columns: î lands on ${vec(1,2)} and ĵ lands on ${vec(3,1)}.`));
+  const area=h('div');body.append(area);
+  const s=h('div',{class:'step'},'<div class="q">Step 1: before you watch, predict where the point (1, 1) lands.</div>');
+  const vi=vecIn('(1, 1) lands at',check);const go=btn('Check',check,'primary');vi.row.append(go);const fb=fbBox();s.append(vi.row,fb);area.append(s);vi.focus();let wrong=0;
+  W.vecs=[{v:[1,1],label:'(1, 1)'}];W.draw();
+  async function check(){const a=vi.get();if(!a){setFb(fb,'info','Enter both numbers.');return}
+    if(eq(a,[4,3])){vi.disable(true);go.disabled=true;setFb(fb,'info','Correct! Now watch the whole grid move…');await W.play(lin(M));pulse(b,[4,3]);
+      setFb(fb,'ok',`1·${vec(1,2)} + 1·${vec(3,1)} = ${vec(4,3)}. The yellow house got stretched and slanted, but its edges stayed straight.`);step2()}
+    else{wrong++;let m=mvDiag(a,M,[1,1]);if(wrong>=2)m+='<br><b>Hint:</b> (1, 1) = î + ĵ, so it lands on (1, 2) + (3, 1).';setFb(fb,'bad',m)}}
+  function step2(){
+    const D=[2,-4,1,-2];
+    predict(area,`Step 2: a new matrix, ${mat(D)}. î lands on ${vec(2,1)} and ĵ lands on ${vec(-4,-2)}, which is −2 times where î lands. Predict: what happens to the grid?`,
+      ['It rotates','All of space gets squished onto a single line','It stretches but still fills the whole plane'],async(j,fb2,bt)=>{
+      W.vecs=[];W.t=0;W.f=p=>p;W.draw();setFb(fb2,'info','Running…');await W.play(lin(D),1800);
+      bt.classList.add(j===1?'right':'wrong');
+      setFb(fb2,j===1?'ok':'bad',(j===1?'Correct! ':'Watch again: ')+'The two columns are <b>linearly dependent</b> (one is a scaled copy of the other), so the whole plane collapses onto the line through (2, 1). That line is their 1D span.');
+      body.append(concept('Reading a matrix',`<p>To picture a matrix, move î to the first column and ĵ to the second column, and drag the rest of space along so grid lines stay parallel and evenly spaced.</p>
+        <p>If the two columns are <b>linearly dependent</b>, the transformation <b>squishes all of 2D space onto a line</b>, the span of those columns.</p>`));complete();
+    });
+  }
+}
+
+/* Mission 7: challenge */
+function m7({b,body,complete}){
+  const W=world(b);let r=0,first=0;
+  body.append(h('p',{class:'story'},'Three challenges with new random numbers, and hints only after two misses.'));
+  const area=h('div');body.append(area);
+  function randM(){let M;do{M=[ri(-2,2),ri(-2,2),ri(-2,2),ri(-2,2)]}while(near(M[0]*M[3]-M[1]*M[2],0)||eq(M,[1,0,0,1]));return M}
+  function round(){
+    area.innerHTML='';b.clear('arrows','ghost','items');W.f=p=>p;W.t=0;W.vecs=[];W.house=false;W.draw();
+    const s=h('div',{class:'step'});area.append(s);const fb=fbBox();let wrong=0;
+    if(r===1){
+      const M=randM();
+      s.innerHTML=`<div class="q">Round 2 of 3: reverse it. Play the mystery transformation, then write its matrix by reading where î and ĵ land.</div>`;
+      const mi=matIn(check);const go=btn('Check',check,'primary');go.disabled=true;
+      const play=btn('▶ Play mystery',async()=>{play.disabled=true;W.t=0;await W.play(lin(M));go.disabled=false;mi.focus()},'primary');
+      const row=h('div',{class:'inrow'});row.append(mi.el,go);
+      s.append(play,h('p',{class:'muted'},'Green boxes are column 1 (where î lands), red boxes are column 2 (where ĵ lands).'),row,fb);
+      function check(){const a=mi.get();if(!a){setFb(fb,'info','Fill in all four numbers.');return}
+        if(eq(a,M)){if(!wrong)first++;mi.disable(true);go.disabled=true;setFb(fb,'ok',`Correct: ${mat(M)}.`);next(s)}
+        else{wrong++;let m=eq(a,[M[0],M[2],M[1],M[3]])?'You wrote the landing spots as <b>rows</b>. Write them as <b>columns</b>.':'Not quite. Read the tip of the green arrow (î) and the red arrow (ĵ) against the light grey grid.';
+          if(wrong>=2)m+=`<br><b>Hint:</b> î landed at (${fmt(M[0])}, ${fmt(M[2])}).`;setFb(fb,'bad',m)}}
+    }else{
+      let M,v,res;do{M=randM();v=[ri(-2,2),ri(-2,2)];res=apply(M,v)}while(!inRange(res)||eq(v,[0,0])||v[0]===0||v[1]===0);
+      s.innerHTML=`<div class="q">Round ${r+1} of 3: compute ${mat(M)} ${vec(...v)}</div>`;
+      W.vecs=[{v,label:'v'}];W.draw();
+      const vi=vecIn('Result',check);const go=btn('Check',check,'primary');vi.row.append(go);s.append(vi.row,fb);vi.focus();
+      async function check(){const a=vi.get();if(!a){setFb(fb,'info','Enter both numbers.');return}
+        if(eq(a,res)){if(!wrong)first++;vi.disable(true);go.disabled=true;await W.play(lin(M),1200);await columnPicture(b,M,v);pulse(b,res);setFb(fb,'ok',`Correct: ${sc(v[0])}·${vec(...col1(M))} + ${sc(v[1])}·${vec(...col2(M))} = ${vec(...res)}`);next(s)}
+        else{wrong++;let m=mvDiag(a,M,v);if(wrong>=2)m+=`<br><b>Hint:</b> ${sc(v[0])}·${vec(...col1(M))} + ${sc(v[1])}·${vec(...col2(M))}`;setFb(fb,'bad',m)}}
+    }
+  }
+  function next(s){if(r<2)s.append(btn('Next round →',()=>{r++;round()},'primary'));else finale()}
+  function finale(){
+    area.append(h('p',{class:'score'},`Solved on the first try: ${first} of 3`));
+    mcq(area,'The big takeaway: every time you see a matrix, you can think of it as…',[
+      {t:'A table of numbers you multiply using a memorised rule',why:'You can, but you lose the picture. What do the columns tell you?'},
+      {t:'A transformation of space, where the columns show where î and ĵ land',ok:true,why:'Yes! Matrix–vector multiplication is just computing what that transformation does to a vector.'},
+      {t:'A list of two vectors that you add together',why:'Close, but you scale the columns by the vector\'s coordinates before adding. The deeper idea is the movement of space.'}
+    ],(s)=>{s.append(concept('🎉 Lab complete! You can now…',`<ul class="done-list">
+      <li>See a <b>transformation</b> as every point in space moving</li>
+      <li>Tell <b>linear</b> transformations apart: lines stay lines, origin stays fixed</li>
+      <li>Work out where any vector lands from where <b>î and ĵ</b> land</li>
+      <li>Read a <b>2×2 matrix</b>: columns = landing spots of the basis vectors</li>
+      <li>Multiply a <b>matrix by a vector</b> as a linear combination of columns</li>
+      <li>Build <b>rotation</b> and <b>shear</b> matrices, and read a matrix as a picture</li>
+      <li>Spot when a matrix <b>squishes space onto a line</b></li></ul>
+      <p>Next up: Chapter 4, <i>matrix multiplication as composition</i>. What happens when you apply one transformation after another?</p>`));complete()});
+  }
+  round();
+}
+
+/* ---------- shell ---------- */
+const KEY='vlab3-done';
+const app=document.getElementById('app'),nav=document.getElementById('nav'),bar=document.getElementById('bar');
+let done=new Set();try{done=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify([...done]))}catch(e){}}
+let current=0;while(done.has(current)&&current<missions.length-1)current++;
+const unlocked=i=>i===0||done.has(i-1)||done.has(i);
+function renderNav(){
+  nav.innerHTML='';
+  missions.forEach((m,i)=>{const bt=h('button',{class:i===current?'cur':'',onclick:()=>{current=i;render()}},
+    `<span>${done.has(i)?'✅':unlocked(i)?'▶':'🔒'}</span>${i+1}. ${m.title}`);bt.disabled=!unlocked(i);nav.append(bt)});
+  bar.style.width=(done.size/missions.length*100)+'%';
+}
+function render(){
+  renderNav();const m=missions[current];app.innerHTML='';
+  const left=h('div',{class:'card board'}),right=h('div',{class:'card'});app.append(left,right);
+  const b=makeBoard();left.append(b.svg);
+  left.append(h('div',{class:'legend'},`<span><i class="sw" style="background:#cbd5e1"></i>original grid</span><span><i class="sw" style="background:#6366f1"></i>moved grid</span><span><i class="sw" style="background:${C.ihat}"></i>î</span><span><i class="sw" style="background:${C.jhat}"></i>ĵ</span><span><i class="sw" style="background:${C.v}"></i>vector</span>`));
+  right.append(h('div',{class:'mhead'},`<span class="num">Mission ${current+1} of ${missions.length}</span><span class="chip">${m.concept}</span><span class="chip t">🎬 ${m.time}</span>`));
+  right.append(h('h2',{},m.title));
+  const body=h('div');right.append(body);
+  let finished=false;
+  m.build({b,body,left,complete:()=>{
+    if(finished)return;finished=true;done.add(current);save();renderNav();
+    const nx=h('div',{class:'next'});
+    if(current<missions.length-1)nx.append(btn('Next mission →',()=>{current++;render();window.scrollTo({top:0,behavior:'smooth'})},'primary'));
+    else nx.append(h('a',{href:'../',class:'btn primary',style:'display:inline-block;text-decoration:none'},'← Back to all chapters'));
+    nx.append(btn('↺ Replay this mission',()=>render()));
+    body.append(nx);
+  }});
+}
+render();
+</script>
+</body>
+</html>

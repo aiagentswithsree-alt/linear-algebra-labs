@@ -9,6 +9,7 @@ Each lab turns one chapter into short missions: **see the problem → predict �
 |---|---|---|
 | 1 | [Vectors](ch01-vectors/index.html) | Coordinates, vectors as arrows and lists, vector addition, scalar multiplication, position vs movement, 3D |
 | 2 | [Span & basis](ch02-span/index.html) | Basis vectors î and ĵ, changing basis, linear combinations, span in 2D and 3D, linear dependence, definition of a basis |
+| 3 | [Transformations & matrices](ch03-transformations/index.html) | Transformations as movement, linearity test, where î and ĵ land, matrix–vector multiplication, rotation, shear, squishing onto a line |
 
 ## How to use
 
@@ -34,4 +35,14 @@ Progress is saved in your browser.
 6. **Span in 3D**: rotatable 3D view of planes and all of space (5:58–8:05)
 7. **Prove it**: random rounds incl. an impossible one, and the basis puzzle (9:12–9:33)
 
-Source videos: 3Blue1Brown's *Essence of linear algebra* series, chapters 1 and 2 ([playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)).
+## Chapter 3 missions
+
+1. **Watch space move**: transformation = function, vectors as points (video 0:43–2:21)
+2. **Linear or not?**: inspect four machines, including one that only a diagonal line exposes (2:39–3:23)
+3. **Follow î and ĵ**: deduce where v lands from the basis vectors (3:35–5:58)
+4. **Matrix × vector**: columns = where î and ĵ land (6:04–7:48)
+5. **Build the matrix**: click to place î and ĵ for a rotation and a shear (8:00–8:55)
+6. **Read a matrix**: matrix → picture, and dependent columns squish space (8:55–9:44)
+7. **Prove it**: random matrix × vector rounds and a reverse round (whole video)
+
+Source videos: 3Blue1Brown's *Essence of linear algebra* series, chapters 1–3 ([playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)).
