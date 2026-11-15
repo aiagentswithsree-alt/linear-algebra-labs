@@ -8,6 +8,7 @@ Each lab turns one chapter into short missions: **see the problem → predict �
 | Chapter | Lab | Concepts |
 |---|---|---|
 | 1 | [Vectors](ch01-vectors/index.html) | Coordinates, vectors as arrows and lists, vector addition, scalar multiplication, position vs movement, 3D |
+| 2 | [Span & basis](ch02-span/index.html) | Basis vectors î and ĵ, changing basis, linear combinations, span in 2D and 3D, linear dependence, definition of a basis |
 
 ## How to use
 
@@ -23,4 +24,14 @@ Progress is saved in your browser.
 5. **Fix the broken command**: position vs movement (goes beyond the video)
 6. **Prove it**: randomised challenge, explain-why questions, 3D extension
 
-Source video: [Vectors | Chapter 1, Essence of linear algebra](https://www.youtube.com/watch?v=fNk_zzaMoSs) by 3Blue1Brown.
+## Chapter 2 missions
+
+1. **Coordinates are knob settings**: basis vectors î and ĵ (video 0:11–1:42)
+2. **Swap the arrows**: a different basis (1:47–3:02)
+3. **Why "linear"?**: linear combinations (3:02–3:29)
+4. **Where can it reach?**: span in 2D, vectors as points (3:29–5:52)
+5. **The useless knob**: linear dependence (8:16–9:06)
+6. **Span in 3D**: rotatable 3D view of planes and all of space (5:58–8:05)
+7. **Prove it**: random rounds incl. an impossible one, and the basis puzzle (9:12–9:33)
+
+Source videos: 3Blue1Brown's *Essence of linear algebra* series, chapters 1 and 2 ([playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)).

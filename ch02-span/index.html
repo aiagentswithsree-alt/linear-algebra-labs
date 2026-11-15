@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vector Lab — Chapter 2: Span, Basis and Linear Dependence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6fb;--card:#ffffff;--ink:#1d2433;--muted:#5d6678;--line:#e3e6ee;
+  --accent:#4f46e5;--accent2:#0ea5e9;--parcel:#f59e0b;--ok:#15803d;--bad:#b91c1c;
+  --okbg:#ecfdf3;--badbg:#fef2f2;--infobg:#eef2ff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;font-size:15px}
+header{max-width:1120px;margin:0 auto;padding:22px 24px 6px}
+.crumb{font-size:13px;margin-bottom:6px}
+h1{font-size:22px;margin:0 0 2px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.loop{display:inline-flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.loop span{font-size:12px;font-weight:600;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.progress{max-width:1120px;margin:14px auto 0;padding:0 24px}
+.bar{height:6px;background:#e6e8f0;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .5s}
+nav{max-width:1120px;margin:10px auto 0;padding:0 24px;display:flex;gap:8px;flex-wrap:wrap}
+nav button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:7px 12px;cursor:pointer;display:flex;gap:6px;align-items:center}
+nav button[disabled]{opacity:.45;cursor:not-allowed}
+nav button.cur{border-color:var(--accent);box-shadow:0 0 0 3px #e0e7ff}
+main{max-width:1120px;margin:16px auto 48px;padding:0 24px;display:grid;grid-template-columns:minmax(300px,470px) 1fr;gap:20px;align-items:start}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.board{position:sticky;top:12px}
+@media(max-width:860px){.board{position:static}}
+svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.sw{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:5px;vertical-align:2px}
+.mhead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.num{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.chip{font-size:12px;background:var(--infobg);color:var(--accent);border-radius:999px;padding:2px 9px;font-weight:600}
+.chip.t{background:#f1f5f9;color:var(--muted)}
+h2{font-size:20px;margin:6px 0 8px}
+.story{color:#374151;margin:0 0 12px}
+.step{border-top:1px dashed var(--line);padding-top:12px;margin-top:12px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.q{font-weight:600;margin-bottom:8px}
+.muted{color:var(--muted);font-size:14px}
+.btn{font:inherit;font-weight:600;font-size:14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;cursor:pointer;margin:4px 6px 4px 0}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:not(:disabled):hover{filter:brightness(.96)}
+.inrow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:6px 0}
+label.f{display:flex;flex-direction:column;font-size:13px;color:var(--muted);gap:4px}
+input[type=number]{font:inherit;font-family:'JetBrains Mono',monospace;font-size:16px;width:84px;padding:7px 9px;border:1.5px solid #cbd2e1;border-radius:9px;text-align:center}
+input[type=number]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px #e0e7ff}
+.vec{display:inline-flex;flex-direction:column;align-items:center;font-family:'JetBrains Mono',monospace;font-weight:700;line-height:1.25;padding:1px 7px;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:4px;vertical-align:middle;margin:0 3px;font-size:14px}
+.m{font-family:'JetBrains Mono',monospace;font-weight:700}
+.fb{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14px;display:none}
+.fb.ok{display:block;background:var(--okbg);color:#14532d;border:1px solid #bbf7d0}
+.fb.bad{display:block;background:var(--badbg);color:#7f1d1d;border:1px solid #fecaca}
+.fb.info{display:block;background:var(--infobg);color:#312e81;border:1px solid #c7d2fe}
+.concept{background:linear-gradient(180deg,#f8f9ff,#fff);border:1px solid #c7d2fe;border-radius:12px;padding:12px 14px;margin-top:12px}
+.concept h3{margin:0 0 6px;font-size:15px;color:var(--accent)}
+.concept p{margin:6px 0}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{font:inherit;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:14px}
+.opt:not(:disabled):hover{border-color:#a5b4fc}
+.opt.right{border-color:#86efac;background:var(--okbg)}
+.opt.wrong{border-color:#fca5a5;background:var(--badbg)}
+.knob{display:flex;align-items:center;gap:10px;margin:6px 0}
+.knob .kn{font-family:'JetBrains Mono',monospace;font-weight:700;min-width:22px}
+input[type=range]{flex:1;accent-color:var(--accent)}
+.kval{font-family:'JetBrains Mono',monospace;font-weight:700;min-width:48px;text-align:right}
+.readout{font-size:14px;margin:6px 0 4px}
+.checks{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0}
+.checks label{display:flex;gap:6px;align-items:center;font-weight:600;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer}
+.next{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.score{font-size:13px;color:var(--muted)}
+.done-list{margin:8px 0 0;padding-left:20px}
+.done-list li{margin:3px 0}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="crumb"><a href="../">← All chapters</a></div>
+  <h1>Vector Lab · Chapter 2: Span, basis and linear dependence</h1>
+  <p class="sub">Your robot now steers with two knobs. Each knob stretches one direction arrow. Which spots can it reach, and when is a knob useless?</p>
+  <div class="loop"><span>1 · See the problem</span><span>2 · Predict</span><span>3 · Try it</span><span>4 · Learn the maths</span></div>
+</header>
+<div class="progress"><div class="bar"><i id="bar"></i></div></div>
+<nav id="nav"></nav>
+<main id="app"></main>
+
+<script>
+/* ---------- constants & helpers ---------- */
+const S=40,O=220,R=5;
+const C={accent:'#4f46e5',accent2:'#0ea5e9',muted:'#94a3b8',bad:'#dc2626',ok:'#16a34a',parcel:'#f59e0b',ihat:'#16a34a',jhat:'#dc2626'};
+const NS='http://www.w3.org/2000/svg';
+const P=(x,y)=>[O+S*x,O-S*y];
+const near=(a,b)=>Math.abs(a-b)<1e-9;
+const eq=(a,b)=>a&&b&&near(a[0],b[0])&&near(a[1],b[1]);
+const fmt=n=>{if(typeof n==='string')return n;n=Math.round(n*1000)/1000;if(Object.is(n,-0))n=0;const s=String(Math.abs(n));return n<0?'−'+s:s};
+const vec=(...xs)=>`<span class="vec">${xs.map(x=>`<span>${fmt(x)}</span>`).join('')}</span>`;
+const sc=n=>n<0?`(${fmt(n)})`:fmt(n);
+const combo=(v1,v2,a,b)=>[a*v1[0]+b*v2[0],a*v1[1]+b*v2[1]];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+
+function el(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function h(tag,attrs={},html=''){const e=document.createElement(tag);for(const k in attrs){if(k==='class')e.className=attrs[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}if(html)e.innerHTML=html;return e}
+function btn(text,fn,cls=''){return h('button',{class:'btn '+cls,onclick:fn},text)}
+function fbBox(){return h('div',{class:'fb',role:'status','aria-live':'polite'})}
+function setFb(box,type,html){box.className='fb '+type;box.innerHTML=html}
+function concept(title,html){return h('div',{class:'concept'},`<h3>${title}</h3>${html}`)}
+function inRange(p){return p&&Math.abs(p[0])<=R+.01&&Math.abs(p[1])<=R+.01}
+
+/* ---------- 2D board ---------- */
+function makeBoard(){
+  const svg=el('svg',{viewBox:'0 0 440 440',role:'img','aria-label':'Room grid with robot'});
+  const defs=el('defs',{},svg);
+  for(const c in C){const m=el('marker',{id:'ah-'+c,viewBox:'0 0 10 10',refX:'8.5',refY:'5',markerWidth:'5.5',markerHeight:'5.5',orient:'auto'},defs);el('path',{d:'M0,0 L10,5 L0,10 z',fill:C[c]},m)}
+  const clip=el('clipPath',{id:'room'},defs);el('rect',{x:20,y:20,width:400,height:400},clip);
+  const grid=el('g',{},svg);
+  el('rect',{x:20,y:20,width:400,height:400,fill:'#fbfcff',rx:6},grid);
+  for(let i=-R;i<=R;i++){
+    const [x]=P(i,0),[,y]=P(0,i),ax=i===0;
+    el('line',{x1:x,y1:20,x2:x,y2:420,stroke:ax?'#475569':'#e6e9f0','stroke-width':ax?1.6:1},grid);
+    el('line',{x1:20,y1:y,x2:420,y2:y,stroke:ax?'#475569':'#e6e9f0','stroke-width':ax?1.6:1},grid);
+    if(i!==0){
+      el('text',{x,y:O+15,'font-size':10,fill:'#94a3b8','text-anchor':'middle','font-family':'Inter'},grid).textContent=fmt(i);
+      el('text',{x:O-7,y:y+3.5,'font-size':10,fill:'#94a3b8','text-anchor':'end','font-family':'Inter'},grid).textContent=fmt(i);
+    }
+  }
+  el('text',{x:412,y:O-6,'font-size':12,'font-weight':700,fill:'#475569','text-anchor':'end'},grid).textContent='x';
+  el('text',{x:O+7,y:32,'font-size':12,'font-weight':700,fill:'#475569'},grid).textContent='y';
+  const root=el('g',{'clip-path':'url(#room)'},svg);
+  const L={tgrid:el('g',{},root),span:el('g',{},root),trail:el('g',{},root),base:el('g',{},svg),arrows:el('g',{},svg),items:el('g',{},svg),ghost:el('g',{},svg),robot:el('g',{},svg)};
+  return {svg,L,clear(...n){n.forEach(k=>L[k].innerHTML='')}};
+}
+function robot(b,pos){
+  const g=el('g',{},b.L.robot);
+  el('line',{x1:0,y1:-12,x2:0,y2:-19,stroke:'#334155','stroke-width':2},g);
+  el('circle',{cx:0,cy:-20,r:2.8,fill:'#f43f5e'},g);
+  el('rect',{x:-12,y:-12,width:24,height:24,rx:7,fill:'#334155'},g);
+  el('circle',{cx:-5,cy:-3,r:2.8,fill:'#a5f3fc'},g);el('circle',{cx:5,cy:-3,r:2.8,fill:'#a5f3fc'},g);
+  el('rect',{x:-5,y:4,width:10,height:2.6,rx:1.3,fill:'#a5f3fc'},g);
+  place(g,pos);return g;
+}
+function place(g,pos){const [x,y]=P(pos[0],pos[1]);g.setAttribute('transform',`translate(${x},${y})`);g.pos=[pos[0],pos[1]]}
+function parcel(b,p,label='parcel'){
+  const [x,y]=P(...p);const g=el('g',{transform:`translate(${x},${y})`},b.L.items);
+  el('rect',{x:-10,y:-10,width:20,height:20,rx:4,fill:C.parcel},g);
+  el('line',{x1:-10,y1:0,x2:10,y2:0,stroke:'#b45309','stroke-width':2},g);
+  el('line',{x1:0,y1:-10,x2:0,y2:10,stroke:'#b45309','stroke-width':2},g);
+  if(label){el('text',{x:13,y:-11,'font-size':12,'font-weight':700,fill:'#b45309',stroke:'#fff','stroke-width':3,'paint-order':'stroke'},g).textContent=label}
+  return g;
+}
+function label(g,x1,y1,x2,y2,text,color,side=1){
+  const mx=(x1+x2)/2,my=(y1+y2)/2,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1;
+  const nx=-dy/len*14*side,ny=dx/len*14*side;
+  el('text',{x:mx+nx,y:my+ny+4,'font-size':13,'font-weight':700,fill:color,'text-anchor':'middle','font-family':'Inter',stroke:'#fff','stroke-width':3,'paint-order':'stroke'},g).textContent=text;
+}
+function arrow(b,from,to,color='accent',o={}){
+  const [x1,y1]=P(...from),[x2,y2]=P(...to);if(Math.hypot(x2-x1,y2-y1)<2)return null;
+  const g=el('g',{},b.L[o.layer||'arrows']);
+  const a={x1,y1,x2,y2,stroke:C[color],'stroke-width':o.w||3.2,'stroke-linecap':'round','marker-end':`url(#ah-${color})`,opacity:o.op||1};
+  if(o.dash)a['stroke-dasharray']='6 5';
+  el('line',a,g);
+  if(o.label)label(g,x1,y1,x2,y2,o.label,C[color],o.side||1);
+  return g;
+}
+function ghostDot(b,p){if(!inRange(p))return;const [x,y]=P(...p);el('circle',{cx:x,cy:y,r:7,fill:'#94a3b8',stroke:'#64748b','stroke-width':2,opacity:.9},b.L.ghost)}
+function pulse(b,p,color=C.ok){const [x,y]=P(...p);const c=el('circle',{cx:x,cy:y,r:12,fill:'none',stroke:color,'stroke-width':3},b.L.ghost);
+  el('animate',{attributeName:'r',from:12,to:30,dur:'0.8s',repeatCount:2},c);el('animate',{attributeName:'opacity',from:1,to:0,dur:'0.8s',repeatCount:2,fill:'freeze'},c)}
+function walk(b,g,to,color='ok',o={}){
+  const from=[...g.pos];const [x1,y1]=P(...from);let line=null;
+  if(color){const a={x1,y1,x2:x1,y2:y1,stroke:C[color],'stroke-width':3.2,'stroke-linecap':'round'};if(o.dash)a['stroke-dasharray']='6 5';line=el('line',a,b.L.arrows)}
+  const ms=o.ms||Math.max(450,Math.hypot(to[0]-from[0],to[1]-from[1])*170);
+  return new Promise(res=>{const t0=performance.now();
+    function step(t){const k=Math.min(1,(t-t0)/ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      const p=[from[0]+(to[0]-from[0])*e,from[1]+(to[1]-from[1])*e];
+      const [x,y]=P(...p);g.setAttribute('transform',`translate(${x},${y})`);
+      if(line){line.setAttribute('x2',x);line.setAttribute('y2',y)}
+      if(k<1)requestAnimationFrame(step);
+      else{place(g,to);if(line&&Math.hypot(to[0]-from[0],to[1]-from[1])>0.05)line.setAttribute('marker-end',`url(#ah-${color})`);res()}}
+    requestAnimationFrame(step)});
+}
+/* basis arrows drawn on the board */
+function drawBasis(b,v1,v2,n1='v₁',n2='v₂',c1='accent',c2='accent2'){
+  b.clear('base');arrow(b,[0,0],v1,c1,{layer:'base',w:4,label:n1});arrow(b,[0,0],v2,c2,{layer:'base',w:4,label:n2,side:-1});
+}
+/* tilted grid for a basis */
+function tiltGrid(b,v1,v2,color='#c7d2fe'){
+  b.clear('tgrid');
+  for(let k=-12;k<=12;k++){
+    const a=combo(v1,v2,k,-14),c=combo(v1,v2,k,14);const [x1,y1]=P(...a),[x2,y2]=P(...c);
+    el('line',{x1,y1,x2,y2,stroke:color,'stroke-width':1.2},b.L.tgrid);
+    const d=combo(v1,v2,-14,k),e=combo(v1,v2,14,k);const [x3,y3]=P(...d),[x4,y4]=P(...e);
+    el('line',{x1:x3,y1:y3,x2:x4,y2:y4,stroke:color,'stroke-width':1.2},b.L.tgrid);
+  }
+}
+/* live linear-combination picture: a·v1 then b·v2 tip-to-tail */
+function drawCombo(b,v1,v2,a,c,n1='v₁',n2='v₂'){
+  b.clear('ghost');
+  const p1=combo(v1,v2,a,0),s=combo(v1,v2,a,c);
+  arrow(b,[0,0],p1,'accent',{layer:'ghost',w:2.6,op:.85,label:`${fmt(a)}${n1}`,side:-1});
+  arrow(b,p1,s,'accent2',{layer:'ghost',w:2.6,op:.85,label:`${fmt(c)}${n2}`,side:-1});
+  if(inRange(s)){const [x,y]=P(...s);el('circle',{cx:x,cy:y,r:5,fill:C.ok},b.L.ghost)}
+  return s;
+}
+/* two knob sliders */
+function knobs(container,{min=-3,max=3,step=0.5,names=['a','b'],colors=['accent','accent2'],init=[1,1],onInput}){
+  const w=h('div');const vals=[...init];const inputs=[];
+  names.forEach((n,i)=>{
+    const row=h('div',{class:'knob'},`<span class="kn" style="color:${C[colors[i]]}">${n}</span>`);
+    const r=h('input',{type:'range',min,max,step,value:init[i],'aria-label':'knob '+n});
+    const v=h('span',{class:'kval'},fmt(init[i]));
+    r.addEventListener('input',()=>{vals[i]=parseFloat(r.value);v.textContent=fmt(vals[i]);onInput&&onInput(vals)});
+    row.append(r,v);w.append(row);inputs.push([r,v]);
+  });
+  container.append(w);
+  return{get:()=>[...vals],set(a){a.forEach((x,i)=>{vals[i]=x;inputs[i][0].value=x;inputs[i][1].textContent=fmt(x)});onInput&&onInput(vals)},disable(d){inputs.forEach(([r])=>r.disabled=d)}};
+}
+function numInputs(names,onEnter){
+  const row=h('div',{class:'inrow'});const ins=names.map(n=>{const i=h('input',{type:'number',step:'0.5','aria-label':n});const l=h('label',{class:'f'},n);l.append(i);row.append(l);i.addEventListener('keydown',e=>{if(e.key==='Enter'&&onEnter)onEnter()});return i});
+  return{row,get(){const v=ins.map(i=>parseFloat(i.value));return v.some(isNaN)?null:v},disable(d){ins.forEach(i=>i.disabled=d)},focus(){ins[0].focus()}};
+}
+function mcq(container,q,options,onRight){
+  const s=h('div',{class:'step'},`<div class="q">${q}</div>`);const opts=h('div',{class:'opts'});const fb=fbBox();
+  options.forEach(o=>{const bt=h('button',{class:'opt',onclick:()=>{
+    if(o.ok){bt.classList.add('right');[...opts.children].forEach(c=>c.disabled=true);setFb(fb,'ok',o.why);onRight&&onRight(s)}
+    else{bt.classList.add('wrong');bt.disabled=true;setFb(fb,'bad',o.why)}}},o.t);opts.append(bt)});
+  s.append(opts,fb);container.append(s);return s;
+}
+/* prediction question: any answer proceeds, then reveal */
+function predict(container,q,options,onPick){
+  const s=h('div',{class:'step'},`<div class="q">${q}</div>`);const opts=h('div',{class:'opts'});const fb=fbBox();
+  options.forEach((o,j)=>{const bt=h('button',{class:'opt',onclick:async()=>{
+    [...opts.children].forEach(c=>c.disabled=true);await onPick(j,fb,bt,s)}},o);opts.append(bt)});
+  s.append(opts,fb);container.append(s);return s;
+}
+function coefDiag(ans,correct,v1,v2,n1='v₁',n2='v₂'){
+  if(eq(ans,[correct[1],correct[0]]))return `You swapped the knobs. <b>a</b> scales ${n1} and <b>b</b> scales ${n2}.`;
+  if(eq(ans,[-correct[0],-correct[1]]))return 'Both signs are flipped. The robot went the opposite way.';
+  if(near(ans[0],correct[0]))return `Knob <b>a</b> is right. Adjust <b>b</b>.`;
+  if(near(ans[1],correct[1]))return `Knob <b>b</b> is right. Adjust <b>a</b>.`;
+  const s=combo(v1,v2,...ans);return `Those knobs land at (${fmt(s[0])}, ${fmt(s[1])}), not at the parcel.`;
+}
+
+/* ---------- 3D viewer (mission 6) ---------- */
+function make3D(){
+  const svg=el('svg',{viewBox:'0 0 440 440',role:'img','aria-label':'3D view of vectors and their span'});
+  const defs=el('defs',{},svg);
+  for(const c in C){const m=el('marker',{id:'ah3-'+c,viewBox:'0 0 10 10',refX:'8.5',refY:'5',markerWidth:'5.5',markerHeight:'5.5',orient:'auto'},defs);el('path',{d:'M0,0 L10,5 L0,10 z',fill:C[c]},m)}
+  const cl=el('clipPath',{id:'room3'},defs);el('rect',{x:20,y:20,width:400,height:400,rx:6},cl);
+  el('rect',{x:20,y:20,width:400,height:400,fill:'#fbfcff',rx:6},svg);
+  const g=el('g',{'clip-path':'url(#room3)'},svg);
+  const st={yaw:0.6,pitch:0.42,vecs:[],plane:null,sweep:false,lineOnly:null};
+  const proj=([x,y,z])=>{const c=Math.cos(st.yaw),s=Math.sin(st.yaw);const xr=x*c-y*s,yr=x*s+y*c;
+    return [O+42*xr,O-42*(z*Math.cos(st.pitch)-yr*Math.sin(st.pitch))]};
+  function line3(a,b,attrs){const [x1,y1]=proj(a),[x2,y2]=proj(b);return el('line',{x1,y1,x2,y2,...attrs},g)}
+  function poly(pts,attrs){return el('polygon',{points:pts.map(p=>proj(p).join(',')).join(' '),...attrs},g)}
+  function draw(){
+    g.innerHTML='';
+    const ax=[[[4,0,0],'x'],[[0,4,0],'y'],[[0,0,4],'z']];
+    ax.forEach(([p,n])=>{line3([-p[0],-p[1],-p[2]],p,{stroke:'#94a3b8','stroke-width':1.4});const [x,y]=proj(p);el('text',{x:x+5,y:y,'font-size':12,'font-weight':700,fill:'#64748b'},g).textContent=n});
+    const add=(a,b,k=1)=>[a[0]+k*b[0],a[1]+k*b[1],a[2]+k*b[2]];
+    if(st.plane){const [u,v]=st.plane;const T=3;
+      const offs=st.sweep?[-2,-1,0,1,2]:[0];
+      offs.forEach(t=>{const o=st.sweep?st.sweep.map(q=>q*t):[0,0,0];
+        const cs=[add(add(o,u,-T),v,-T),add(add(o,u,T),v,-T),add(add(o,u,T),v,T),add(add(o,u,-T),v,T)];
+        poly(cs,{fill:t===0?'#6366f1':'#38bdf8','fill-opacity':t===0?.18:.08,stroke:t===0?'#6366f1':'#38bdf8','stroke-opacity':.5});
+        if(t===0)for(let k=-T;k<=T;k++){line3(add(add(o,u,k),v,-T),add(add(o,u,k),v,T),{stroke:'#a5b4fc','stroke-width':.8});line3(add(add(o,v,k),u,-T),add(add(o,v,k),u,T),{stroke:'#a5b4fc','stroke-width':.8})}
+      })}
+    if(st.lineOnly){const d=st.lineOnly;line3(d.map(x=>-4*x),d.map(x=>4*x),{stroke:'#6366f1','stroke-width':3,'stroke-opacity':.35})}
+    st.vecs.forEach(([v,c,n])=>{const [x2,y2]=proj(v);line3([0,0,0],v,{stroke:C[c],'stroke-width':3.6,'stroke-linecap':'round','marker-end':`url(#ah3-${c})`});
+      el('text',{x:x2+6,y:y2-6,'font-size':13,'font-weight':700,fill:C[c],stroke:'#fff','stroke-width':3,'paint-order':'stroke'},g).textContent=n});
+  }
+  let drag=null;
+  svg.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY,st.yaw,st.pitch];svg.setPointerCapture(e.pointerId)});
+  svg.addEventListener('pointermove',e=>{if(!drag)return;st.yaw=drag[2]+(e.clientX-drag[0])*0.01;st.pitch=Math.max(-1.2,Math.min(1.2,drag[3]+(e.clientY-drag[1])*0.01));draw()});
+  svg.addEventListener('pointerup',()=>drag=null);
+  svg.style.cursor='grab';
+  draw();
+  return{svg,st,draw};
+}
+
+/* ---------- missions ---------- */
+const missions=[
+{title:'Coordinates are knob settings',concept:'Basis vectors î and ĵ',time:'0:11–1:42',build:m1},
+{title:'Swap the arrows',concept:'A different basis',time:'1:47–3:02',build:m2},
+{title:'Why "linear"?',concept:'Linear combination',time:'3:02–3:29',build:m3},
+{title:'Where can it reach?',concept:'Span in 2D, vectors as points',time:'3:29–5:52',build:m4},
+{title:'The useless knob',concept:'Linear dependence',time:'8:16–9:06',build:m5},
+{title:'Span in 3D',concept:'Planes and all of space',time:'5:58–8:05',build:m6,threeD:true},
+{title:'Prove it',concept:'Put it all together',time:'Whole video + basis puzzle',build:m7},
+];
+
+/* Mission 1: coordinates as scalars of i-hat and j-hat */
+function m1({b,body,complete}){
+  const I=[1,0],J=[0,1];
+  body.append(h('p',{class:'story'},`In Chapter 1 you typed commands like ${vec(3,-2)}. Now look at them a new way. The robot has two special arrows of length 1: <b style="color:${C.ihat}">î</b> points right and <b style="color:${C.jhat}">ĵ</b> points up. It has two knobs. Knob <b>a</b> stretches î and knob <b>b</b> stretches ĵ, and the robot moves along a·î + b·ĵ.`));
+  arrow(b,[0,0],I,'ihat',{layer:'base',w:4.5,label:'î',side:-1});arrow(b,[0,0],J,'jhat',{layer:'base',w:4.5,label:'ĵ'});
+  const rb=robot(b,[0,0]);
+  const tasks=[[3,-2],[-2,1.5]];let i=0;
+  const area=h('div');body.append(area);
+  function task(){
+    area.innerHTML='';b.clear('items','arrows','ghost');place(rb,[0,0]);const t=tasks[i];parcel(b,t);let wrong=0;
+    const s=h('div',{class:'step'});area.append(s);const fb=fbBox();
+    if(i===0){
+      s.append(h('div',{class:'q'},`Task 1: turn the knobs so the green dot lands on the parcel, then send the robot.`));
+      const kn=knobs(s,{init:[1,1],names:['a','b'],colors:['ihat','jhat'],onInput:([a,c])=>{drawCombo(b,I,J,a,c,'î','ĵ');ro.innerHTML=`a·î + b·ĵ = ${sc(a)}${vec(1,0)} + ${sc(c)}${vec(0,1)} = ${vec(a,c)}`}});
+      const ro=h('p',{class:'readout'});s.append(ro);kn.set([1,1]);
+      const go=btn('▶ Send robot',async()=>{
+        const [a,c]=kn.get();go.disabled=true;kn.disable(true);
+        await walk(b,rb,combo(I,J,a,c),'ok',{dash:!eq([a,c],t)});
+        if(eq([a,c],t)){pulse(b,t);setFb(fb,'ok',`Delivered! Look at the knob settings: a = 3, b = −2. Those are exactly the coordinates of ${vec(3,-2)}.`);next(s)}
+        else{wrong++;let m=coefDiag([a,c],t,I,J,'î','ĵ');if(wrong>=2)m+='<br><b>Hint:</b> how far right is the parcel? That is a. How far up or down? That is b.';setFb(fb,'bad',m);await sleep(700);place(rb,[0,0]);b.clear('arrows');go.disabled=false;kn.disable(false)}
+      },'primary');s.append(go,fb);
+    }else{
+      s.append(h('div',{class:'q'},`Task 2: no sliders this time. The parcel is at (−2, 1.5). What should knobs a and b be?`));
+      const ni=numInputs(['a (scales î)','b (scales ĵ)'],check);const go=btn('Check & send',check,'primary');ni.row.append(go);s.append(ni.row,fb);ni.focus();
+      async function check(){const ans=ni.get();if(!ans){setFb(fb,'info','Enter both knob values.');return}
+        go.disabled=true;b.clear('arrows','ghost');place(rb,[0,0]);drawCombo(b,I,J,ans[0],ans[1],'î','ĵ');
+        const end=combo(I,J,...ans);if(inRange(end))await walk(b,rb,end,eq(ans,t)?'ok':'bad',{dash:!eq(ans,t)});
+        if(eq(ans,t)){ni.disable(true);pulse(b,t);setFb(fb,'ok',`Correct: −2·î + 1.5·ĵ = ${vec(-2,1.5)}.`);
+          s.append(concept('Coordinates are scalars',`<p>Every coordinate is a <b>scalar</b>. In ${vec(3,-2)}, the 3 stretches î and the −2 flips and stretches ĵ. The vector is the <b>sum of two scaled vectors</b>: 3î + (−2)ĵ.</p>
+            <p>î and ĵ together are called the <b>basis</b> of the coordinate system. They are what the coordinates actually scale.</p>`));complete()}
+        else{wrong++;let m=coefDiag(ans,t,I,J,'î','ĵ');if(wrong>=2)m+='<br><b>Hint:</b> a = the x-coordinate, b = the y-coordinate.';setFb(fb,'bad',m);await sleep(600);place(rb,[0,0]);b.clear('arrows');go.disabled=false}}
+    }
+  }
+  function next(s){if(i<tasks.length-1)s.append(btn('Next task →',()=>{i++;task()},'primary'))}
+  task();
+}
+
+/* Mission 2: a different basis */
+function m2({b,body,complete}){
+  const v1=[1,1],v2=[1,-1];
+  body.append(h('p',{class:'story'},`A mechanic rewired the robot. Now knob a stretches <b style="color:${C.accent}">v₁</b> = ${vec(1,1)} (up and right) and knob b stretches <b style="color:${C.accent2}">v₂</b> = ${vec(1,-1)} (down and right). The purple tilted grid shows the new "squares" these arrows make.`));
+  tiltGrid(b,v1,v2);drawBasis(b,v1,v2);
+  const rb=robot(b,[0,0]);
+  const tasks=[{t:[3,1],k:[2,1]},{t:[0,2],k:[1,-1]}];let i=0;
+  const area=h('div');body.append(area);
+  function task(){
+    area.innerHTML='';b.clear('items','arrows','ghost');place(rb,[0,0]);const {t,k}=tasks[i];parcel(b,t);let wrong=0;
+    const s=h('div',{class:'step'},`<div class="q">Task ${i+1} of ${tasks.length}: the parcel is at (${fmt(t[0])}, ${fmt(t[1])}) on the normal grid. Find the knob settings with the <b>new</b> arrows.</div>`);
+    area.append(s);const fb=fbBox();
+    const ro=h('p',{class:'readout'});
+    const kn=knobs(s,{init:[0,0],onInput:([a,c])=>{const e=drawCombo(b,v1,v2,a,c);ro.innerHTML=`${sc(a)}·v₁ + ${sc(c)}·v₂ = ${vec(e[0],e[1])}`}});
+    s.append(ro);kn.set([0,0]);
+    const go=btn('▶ Send robot',async()=>{
+      const ans=kn.get();go.disabled=true;kn.disable(true);const ok=eq(ans,k);
+      await walk(b,rb,combo(v1,v2,...ans),ok?'ok':'bad',{dash:!ok});
+      if(ok){pulse(b,t);
+        setFb(fb,'ok',i===0?`Delivered! The same parcel is <b>(3, 1)</b> with î and ĵ, but <b>[2; 1]</b> with v₁ and v₂. Count the tilted squares: 2 steps along v₁, 1 step along v₂.`:`Delivered! 1·v₁ + (−1)·v₂ = ${vec(1,1)} − ${vec(1,-1)} = ${vec(0,2)}.`);
+        if(i<tasks.length-1)s.append(btn('Next task →',()=>{i++;task()},'primary'));else finish();
+      }else{wrong++;let m=eq(ans,t)?'Those are the <b>normal-grid</b> coordinates. With the new arrows, the knob numbers are different. Follow the tilted grid.':coefDiag(ans,k,v1,v2);
+        if(wrong>=2)m+=`<br><b>Hint:</b> try a = ${fmt(k[0])} first, then adjust b.`;setFb(fb,'bad',m);await sleep(700);place(rb,[0,0]);b.clear('arrows');go.disabled=false;kn.disable(false)}
+    },'primary');s.append(go,fb);
+  }
+  function finish(){
+    mcq(area,'The parcel at (3, 1) got the numbers [3; 1] with î, ĵ and [2; 1] with v₁, v₂. Which are its "true" coordinates?',[
+      {t:'[3; 1], because î and ĵ are the real ones',why:'î and ĵ are only the usual <i>choice</i>. Nothing makes them more "real".'},
+      {t:'[2; 1], because the new arrows are newer',why:'Newer is not more correct. Think about what the numbers depend on.'},
+      {t:'Both. The numbers depend on which basis you choose',ok:true,why:'Exactly. The arrow to the parcel never changed; only its <i>description</i> did.'}
+    ],(s)=>{s.append(concept('Choosing a basis',`<p>We could have picked different basis vectors and still had a perfectly good coordinate system. Every pair of numbers still matches exactly one vector, but the matching is different.</p>
+      <p>So whenever we write a vector as numbers, we are <b>quietly assuming a choice of basis</b>, usually î and ĵ.</p>`));complete()});
+  }
+  task();
+}
+
+/* Mission 3: why "linear" */
+function m3({b,body,complete}){
+  const v1=[2,1],v2=[-1,2];
+  body.append(h('p',{class:'story'},`Scaling two vectors and adding them, a·v₁ + b·v₂, is called a <b>linear combination</b>. Here v₁ = ${vec(2,1)} and v₂ = ${vec(-1,2)}. But why "linear"? What do lines have to do with it?`));
+  drawBasis(b,v1,v2);
+  const area=h('div');body.append(area);
+  let s1;
+  s1=predict(area,'Predict: you <b>freeze knob a at 1</b> and spin knob b from −3 to 3. What shape does the tip of a·v₁ + b·v₂ trace?',['A circle','A straight line','A curve'],async(j,fb,bt)=>{
+    setFb(fb,'info','Spinning knob b…');
+    await sweepTrail(1,null,'accent2');
+    bt.classList.add(j===1?'right':'wrong');
+    setFb(fb,j===1?'ok':'bad',(j===1?'Correct! ':'Look again: ')+'The tip moves along a <b>straight line</b>. Each extra step of b adds the same v₂ again.');
+    step2();
+  });
+  async function sweepTrail(fixA,fixB,color){
+    for(let k=-3;k<=3.0001;k+=0.25){const a=fixA??k,c=fixB??k;drawCombo(b,v1,v2,a,c);const p=combo(v1,v2,a,c);
+      if(inRange(p)){const [x,y]=P(...p);el('circle',{cx:x,cy:y,r:3.4,fill:C[color]},b.L.trail)}await sleep(55)}
+  }
+  function step2(){
+    const s=h('div',{class:'step'},'<div class="q">Now freeze <b>b at 1</b> and spin knob a.</div>');const fb=fbBox();
+    const go=btn('▶ Spin knob a',async()=>{go.disabled=true;await sweepTrail(null,1,'accent');
+      setFb(fb,'ok','Another straight line, this time parallel to v₁. Fix either scalar and let the other run free, and the tip always draws a line.');step3()},'primary');
+    s.append(go,fb);area.append(s);
+  }
+  function step3(){
+    const s=h('div',{class:'step'},'<div class="q">Free play: move both knobs. Can you land the green dot on (1, 3)?</div>');const fb=fbBox();
+    parcel(b,[1,3],'(1, 3)');
+    const ro=h('p',{class:'readout'});
+    const kn=knobs(s,{init:[0,0],onInput:([a,c])=>{const e=drawCombo(b,v1,v2,a,c);ro.innerHTML=`${sc(a)}·v₁ + ${sc(c)}·v₂ = ${vec(e[0],e[1])}`;
+      if(eq(e,[1,3])&&!done){done=true;pulse(b,[1,3]);setFb(fb,'ok','Got it: 1·v₁ + 1·v₂ = (1, 3). The two lines you drew cross exactly there.');
+        s.append(concept('Linear combination',`<p><b>a·v₁ + b·v₂</b> with any scalars a and b is a <b>linear combination</b> of v₁ and v₂.</p>
+          <p>One way to remember the word: fix one scalar, let the other change freely, and the tip traces a straight <b>line</b>.</p>`));complete()}}});
+    let done=false;s.append(ro,fb);area.append(s);kn.set([0,0]);
+  }
+}
+
+/* Mission 4: span in 2D */
+function m4({b,body,complete}){
+  const cases=[
+    {name:'Case A',v1:[1,1],v2:[1,-1],parcels:[['P',[3,1]],['Q',[-2,3]],['R',[0,-4]]],reach:[1,1,1],
+      sum:'These two arrows point in different directions, so together they reach <b>every point in the plane</b>.'},
+    {name:'Case B',v1:[1,2],v2:[-2,-4],parcels:[['P',[2,4]],['Q',[3,1]],['R',[-1,-2]]],reach:[1,0,1],
+      sum:'v₂ = −2·v₁: the arrows <b>line up</b>. Every combination stays on one line through the origin, so Q is out of reach.'},
+    {name:'Case C',v1:[0,0],v2:[0,0],parcels:[['P',[0,0]],['Q',[2,-1]]],reach:[1,0],
+      sum:'Both arrows are the zero vector. Scaling zero gives zero, so the robot is <b>stuck at the origin</b>.'}
+  ];let i=0;
+  body.append(h('p',{class:'story'},'The robot can use <b>any</b> knob values, positive, negative, large or small. The set of all spots it can reach with a·v₁ + b·v₂ is called the <b>span</b> of v₁ and v₂. For each pair of arrows, predict which parcels are inside the span.'));
+  const area=h('div');body.append(area);
+  function run(){
+    const cs=cases[i];area.innerHTML='';b.clear('items','span','ghost','base','trail');
+    drawBasis(b,cs.v1,cs.v2);cs.parcels.forEach(([n,p])=>parcel(b,p,n));
+    const s=h('div',{class:'step'},`<div class="q">${cs.name}: v₁ = ${vec(...cs.v1)}, v₂ = ${vec(...cs.v2)}. Tick every parcel the robot can reach.</div>`);
+    const checks=h('div',{class:'checks'});const boxes=cs.parcels.map(([n])=>{const l=h('label',{},`<input type="checkbox"> ${n}`);checks.append(l);return l.querySelector('input')});
+    const fb=fbBox();
+    const go=btn('Check, then sweep every combination',async()=>{
+      go.disabled=true;boxes.forEach(x=>x.disabled=true);
+      setFb(fb,'info','Sweeping knob values from −3 to 3… every dot is the tip of one reachable vector.');
+      await sweep(cs);
+      const pickd=boxes.map(x=>x.checked?1:0);const right=pickd.every((v,j)=>v===cs.reach[j]);
+      cs.parcels.forEach(([n,p],j)=>{const [x,y]=P(...p);el('text',{x:x-14,y:y+24,'font-size':13,'font-weight':700,fill:cs.reach[j]?C.ok:C.bad},b.L.ghost).textContent=cs.reach[j]?'✓ reach':'✗ no'});
+      setFb(fb,right?'ok':'bad',(right?'<b>All correct.</b> ':'<b>Not quite.</b> ')+cs.sum);
+      if(i<cases.length-1)s.append(btn('Next case →',()=>{i++;run()},'primary'));
+      else{s.append(concept('Span, and vectors as points',`<p>The <b>span</b> of v₁ and v₂ is every vector you can reach with a·v₁ + b·v₂, using only addition and scaling.</p>
+        <p>In 2D the span is one of three things: <b>the whole plane</b> (most pairs), <b>a line through the origin</b> (when the arrows line up) or <b>just the origin</b> (both zero).</p>
+        <p>Did you notice the dots? When you think about <b>many vectors at once</b>, draw each one as the point at its tip. A single vector, think arrow. A collection, think points.</p>`));complete()}
+    },'primary');
+    s.append(checks,go,fb);area.append(s);
+  }
+  async function sweep(cs){
+    const pts=[];for(let a=-3;a<=3.0001;a+=0.25)for(let c=-3;c<=3.0001;c+=0.25)pts.push(combo(cs.v1,cs.v2,a,c));
+    const seen=new Set();let n=0;
+    for(const p of pts){if(!inRange(p))continue;const key=p.map(x=>x.toFixed(2)).join();if(seen.has(key))continue;seen.add(key);
+      const [x,y]=P(...p);el('circle',{cx:x,cy:y,r:2.6,fill:C.accent,opacity:.55},b.L.span);if(++n%40===0)await sleep(16)}
+    if(n===1){const [x,y]=P(0,0);el('circle',{cx:x,cy:y,r:7,fill:C.accent,opacity:.6},b.L.span)}
+  }
+  run();
+}
+
+/* Mission 5: linear dependence */
+function m5({b,body,complete}){
+  const u=[1,0],v=[0,1],w=[1,1];
+  body.append(h('p',{class:'story'},`An upgrade gave the robot a <b>third</b> knob. Now it moves along a·u + b·v + c·w with u = ${vec(...u)}, v = ${vec(...v)} and w = ${vec(...w)}. Is the third knob worth paying for?`));
+  arrow(b,[0,0],u,'accent',{layer:'base',w:4,label:'u',side:-1});arrow(b,[0,0],v,'accent2',{layer:'base',w:4,label:'v'});arrow(b,[0,0],w,'parcel',{layer:'base',w:4,label:'w'});
+  const area=h('div');body.append(area);
+  const s=h('div',{class:'step'},'<div class="q">Step 1: can you build w using only u and v? Find p and q so that p·u + q·v = w.</div>');
+  const ni=numInputs(['p (scales u)','q (scales v)'],check);const go=btn('Check',check,'primary');ni.row.append(go);const fb=fbBox();s.append(ni.row,fb);area.append(s);ni.focus();
+  let wrong=0;
+  function check(){const a=ni.get();if(!a){setFb(fb,'info','Enter both numbers.');return}
+    b.clear('ghost');drawCombo(b,u,v,a[0],a[1],'u','v');
+    if(eq(a,[1,1])){ni.disable(true);go.disabled=true;setFb(fb,'ok','Yes: 1·u + 1·v = w. The third knob can be copied using the other two.');step2()}
+    else{wrong++;setFb(fb,'bad',coefDiag(a,[1,1],u,v,'u','v')+(wrong>=2?'<br><b>Hint:</b> w goes 1 right and 1 up.':''))}}
+  function step2(){
+    mcq(area,'Step 2: if you remove the w knob, does the robot lose any spots it could reach?',[
+      {t:'Yes, w lets it reach new places',why:'Anything w does, 1·u + 1·v already does. So no new places.'},
+      {t:'No, u and v already reach everything w can',ok:true,why:'Right. w is <b>redundant</b>: removing it does not shrink the span. The three vectors are <b>linearly dependent</b>.'}
+    ],()=>step3());
+  }
+  function step3(){
+    b.clear('base','ghost');const p=[2,1],q=[-4,-2];
+    arrow(b,[0,0],p,'accent',{layer:'base',w:4,label:'p'});arrow(b,[0,0],q,'accent2',{layer:'base',w:4,label:'q',side:-1});
+    const s=h('div',{class:'step'},`<div class="q">Step 3: a different robot has only two knobs, p = ${vec(...p)} and q = ${vec(...q)}. q is a scaled copy of p. What number k makes q = k·p?</div>`);
+    const ni=numInputs(['k'],chk);const go=btn('Check',chk,'primary');ni.row.append(go);const fb=fbBox();s.append(ni.row,fb);area.append(s);ni.focus();
+    function chk(){const a=ni.get();if(!a){setFb(fb,'info','Enter k.');return}
+      if(near(a[0],-2)){ni.disable(true);go.disabled=true;setFb(fb,'ok','k = −2. These two arrows lie on the same line, so one is redundant. They are linearly dependent, and their span is only a line.');step4()}
+      else setFb(fb,'bad',near(a[0],2)?'Right size, wrong direction: q points the opposite way to p.':`k·p would be ${vec(2*a[0],a[0])}. Compare it with q.`)}
+  }
+  function step4(){
+    b.clear('base');const p=[2,1],r=[1,2];
+    arrow(b,[0,0],p,'accent',{layer:'base',w:4,label:'p'});arrow(b,[0,0],r,'accent2',{layer:'base',w:4,label:'r'});
+    mcq(area,`Step 4: what about p = ${vec(...p)} and r = ${vec(...r)}?`,[
+      {t:'Dependent: r is a scaled copy of p',why:'Try it: 2·k = 1 means k = ½, but then k·1 = ½, not 2. No single k works.'},
+      {t:'Independent: each one adds a new direction',ok:true,why:'Correct. Neither is a scaled copy of the other, so together they span the whole plane.'}
+    ],(s)=>{s.append(concept('Linearly dependent vs independent',`<p>Vectors are <b>linearly dependent</b> if you can remove one without shrinking the span. Equivalently, one of them can be written as a linear combination of the others (w = u + v, q = −2p).</p>
+      <p>They are <b>linearly independent</b> if every vector adds a new dimension to the span.</p>`));complete()});
+  }
+}
+
+/* Mission 6: span in 3D */
+function m6({body,complete,left}){
+  left.innerHTML='';const V=make3D();left.append(V.svg);
+  left.append(h('div',{class:'legend'},'<span>🖱️ Drag the picture to rotate it</span>'));
+  const st=V.st;
+  body.append(h('p',{class:'story'},'Now the robot is a <b>drone</b>, free to move in 3D. Each knob still stretches one arrow. Drag the 3D picture to look at it from different angles.'));
+  const area=h('div');body.append(area);
+  const v1=[2,0,0.5],v2=[0,2,0.8],v3in=[2,2,1.3],v3out=[0,0,2.5];
+  st.vecs=[[v1,'accent','v₁'],[v2,'accent2','v₂']];V.draw();
+  predict(area,`Stage 1: the drone has two knobs, v₁ = ${vec(...v1)} and v₂ = ${vec(...v2)}. They point in different directions. What is their span?`,['A line','A flat sheet (plane) through the origin','All of 3D space'],async(j,fb,bt)=>{
+    st.plane=[v1,v2];V.draw();bt.classList.add(j===1?'right':'wrong');
+    setFb(fb,j===1?'ok':'bad',(j===1?'Correct! ':'Not quite. ')+'Turning two knobs makes the tip sweep out a <b>flat sheet through the origin</b>. Two arrows can only cover two directions.');stage2();
+  });
+  function stage2(){
+    st.vecs.push([v3in,'parcel','v₃']);V.draw();
+    predict(area,`Stage 2: add a third knob, v₃ = ${vec(...v3in)}, which happens to be v₁ + v₂. What is the span now?`,['Still the same flat sheet','All of 3D space'],async(j,fb,bt)=>{
+      bt.classList.add(j===0?'right':'wrong');
+      setFb(fb,j===0?'ok':'bad',(j===0?'Correct! ':'Rotate the picture: v₃ lies in the sheet. ')+'v₃ already sits <b>on</b> the span of v₁ and v₂, so it adds nothing new. The drone is still trapped on the sheet. These three are linearly dependent.');stage3();
+    });
+  }
+  function stage3(){
+    st.vecs[2]=[v3out,'ok','v₃'];V.draw();
+    predict(area,`Stage 3: swap v₃ for ${vec(...v3out)}, which points straight up out of the sheet. Now what?`,['Still a flat sheet','All of 3D space'],async(j,fb,bt)=>{
+      bt.classList.add(j===1?'right':'wrong');setFb(fb,'info','Scaling v₃ slides the sheet up and down…');
+      st.sweep=[0,0,1];for(let k=0;k<2;k++){for(let y=0.15;y<=1.6;y+=0.05){st.yaw+=0.01;V.draw();await sleep(16)}}
+      setFb(fb,j===1?'ok':'bad',(j===1?'Correct! ':'Watch the sheets: ')+'Scaling v₃ moves the sheet up and down, <b>sweeping it through all of space</b>. Three independent arrows, three knobs, three dimensions.');
+      body.append(concept('Span in 3D',`<p>Two arrows in different directions span a <b>plane through the origin</b>.</p>
+        <p>A third arrow either <b>lies on that plane</b> (span unchanged, the vectors are dependent) or <b>points out of it</b> (span becomes all of 3D space, the vectors are independent).</p>
+        <p>A random third vector almost never lies exactly on the plane, so usually you get all of space.</p>`));complete();
+    });
+  }
+}
+
+/* Mission 7: independent challenge */
+function m7({b,body,complete}){
+  const bases=[[[1,0],[1,1]],[[2,1],[1,1]],[[1,1],[-1,0]],[[1,2],[0,1]],[[-1,1],[1,0]],[[2,1],[3,2]],[[1,-1],[1,0]]];
+  const dep=[[[1,2],[2,4]],[[2,-1],[-4,2]],[[1,1],[-2,-2]]];
+  const plan=['solve','trap','solve'];let r=0,first=0;
+  body.append(h('p',{class:'story'},'Three deliveries, new knob arrows each time, no hints unless you need them. Careful: one round might be impossible.'));
+  const area=h('div');body.append(area);let rb=robot(b,[0,0]);
+  function round(){
+    area.innerHTML='';b.clear('items','arrows','ghost','base','tgrid','span');place(rb,[0,0]);
+    let v1,v2,t,k,trap=plan[r]==='trap';
+    if(!trap){do{[v1,v2]=pick(bases);k=[pick([-2,-1,1,2]),pick([-2,-1,1,2])];t=combo(v1,v2,...k)}while(!inRange(t)||(near(t[0],0)&&near(t[1],0)))}
+    else{[v1,v2]=pick(dep);t=[v1[1]===0?1:-v1[1],v1[0]]; if(Math.abs(t[0])>4||Math.abs(t[1])>4)t=[2,-1];
+      if(near(v1[0]*t[1]-v1[1]*t[0],0))t=[t[0]+1,t[1]];}
+    drawBasis(b,v1,v2);parcel(b,t);
+    const s=h('div',{class:'step'},`<div class="q">Round ${r+1} of 3: v₁ = ${vec(...v1)}, v₂ = ${vec(...v2)}. The parcel is at (${fmt(t[0])}, ${fmt(t[1])}). Find a and b, or decide it can't be done.</div>`);
+    const ni=numInputs(['a (scales v₁)','b (scales v₂)'],check);const go=btn('Send',check,'primary');const no=btn('It\'s unreachable',impossible);ni.row.append(go,no);const fb=fbBox();s.append(ni.row,fb);area.append(s);ni.focus();
+    let wrong=0,busy=false;
+    async function check(){if(busy)return;const ans=ni.get();if(!ans){setFb(fb,'info','Enter both numbers, or press "It\'s unreachable".');return}
+      busy=true;go.disabled=no.disabled=true;b.clear('arrows','ghost');place(rb,[0,0]);drawCombo(b,v1,v2,...ans);
+      const end=combo(v1,v2,...ans);const ok=!trap&&eq(end,t);
+      if(inRange(end))await walk(b,rb,end,ok?'ok':'bad',{dash:!ok});
+      if(ok){if(!wrong)first++;ni.disable(true);pulse(b,t);setFb(fb,'ok',`Delivered! ${sc(ans[0])}·v₁ + ${sc(ans[1])}·v₂ = ${vec(...t)}`);done(s)}
+      else{wrong++;let m=trap?'Missed. Look where every attempt lands: on the same line as v₁. Is the parcel even on the span of v₁ and v₂?':coefDiag(ans,k,v1,v2);
+        if(wrong>=2&&!trap)m+=`<br><b>Hint:</b> try a = ${fmt(k[0])}.`;if(wrong>=2&&trap)m+='<br><b>Hint:</b> v₂ is a multiple of v₁.';
+        setFb(fb,'bad',m);await sleep(600);place(rb,[0,0]);go.disabled=no.disabled=false;busy=false}}
+    async function impossible(){if(busy)return;busy=true;go.disabled=no.disabled=true;
+      if(trap){if(!wrong)first++;ni.disable(true);
+        for(let k2=-6;k2<=6;k2+=0.25){const p=combo(v1,[0,0],k2,0);if(inRange(p)){const [x,y]=P(...p);el('circle',{cx:x,cy:y,r:2.6,fill:C.accent,opacity:.55},b.L.span)}}
+        setFb(fb,'ok','Right, it\'s impossible. v₁ and v₂ line up, so their span is just the dotted line, and the parcel is off it. These two vectors are <b>not a basis</b> for the plane.');done(s)}
+      else{wrong++;setFb(fb,'bad','It <i>is</i> reachable. v₁ and v₂ point in different directions, so their span is the whole plane.');go.disabled=no.disabled=false;busy=false}}
+  }
+  function done(s){if(r<2)s.append(btn('Next round →',()=>{r++;round()},'primary'));else finale()}
+  function finale(){
+    area.append(h('p',{class:'score'},`Solved on the first try: ${first} of 3`));
+    mcq(area,'The basis puzzle from the end of the video. A <b>basis</b> of a space is "a set of linearly independent vectors that span the space". Why do we need <b>both</b> conditions?',[
+      {t:'"Span" alone is enough; independence is just tidy',why:'With a redundant vector (like w in Mission 5), the same spot gets many different knob settings, so coordinates would not be unique.'},
+      {t:'Span: every vector is reachable. Independent: no wasted arrow, so each vector gets exactly one set of coordinates',ok:true,why:'Exactly. Spanning means you can reach everything; independence means nothing is redundant. Together, every vector has one and only one coordinate description, just like î and ĵ.'},
+      {t:'Independence alone is enough',why:'One single non-zero vector is independent, but it only spans a line. It can\'t describe the whole plane.'}
+    ],(s)=>{s.append(concept('🎉 Lab complete! You can now…',`<ul class="done-list">
+      <li>Read coordinates as <b>scalars</b> that stretch the basis vectors î and ĵ</li>
+      <li>Find coordinates in a <b>different basis</b>, and see why numbers depend on the basis</li>
+      <li>Build <b>linear combinations</b> and explain the word "linear"</li>
+      <li>Predict the <b>span</b> of two vectors: plane, line or origin</li>
+      <li>Think of a collection of vectors as <b>points</b></li>
+      <li>Spot <b>linearly dependent</b> vs <b>independent</b> vectors in 2D and 3D</li>
+      <li>Explain why a <b>basis</b> = independent + spanning</li></ul>
+      <p>Next up: Chapter 3, <i>linear transformations and matrices</i>. What happens when you move the whole grid at once?</p>`));complete()});
+  }
+  round();
+}
+
+/* ---------- shell ---------- */
+const KEY='vlab2-done';
+const app=document.getElementById('app'),nav=document.getElementById('nav'),bar=document.getElementById('bar');
+let done=new Set();try{done=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify([...done]))}catch(e){}}
+let current=0;while(done.has(current)&&current<missions.length-1)current++;
+const unlocked=i=>i===0||done.has(i-1)||done.has(i);
+function renderNav(){
+  nav.innerHTML='';
+  missions.forEach((m,i)=>{const bt=h('button',{class:i===current?'cur':'',onclick:()=>{current=i;render()}},
+    `<span>${done.has(i)?'✅':unlocked(i)?'▶':'🔒'}</span>${i+1}. ${m.title}`);bt.disabled=!unlocked(i);nav.append(bt)});
+  bar.style.width=(done.size/missions.length*100)+'%';
+}
+function render(){
+  renderNav();const m=missions[current];app.innerHTML='';
+  const left=h('div',{class:'card board'}),right=h('div',{class:'card'});app.append(left,right);
+  const b=makeBoard();left.append(b.svg);
+  left.append(h('div',{class:'legend'},`<span><i class="sw" style="background:${C.accent}"></i>a × first arrow</span><span><i class="sw" style="background:${C.accent2}"></i>b × second arrow</span><span><i class="sw" style="background:${C.ok}"></i>result</span><span>1 square = 1 m</span>`));
+  right.append(h('div',{class:'mhead'},`<span class="num">Mission ${current+1} of ${missions.length}</span><span class="chip">${m.concept}</span><span class="chip t">🎬 ${m.time}</span>`));
+  right.append(h('h2',{},m.title));
+  const body=h('div');right.append(body);
+  let finished=false;
+  m.build({b,body,left,complete:()=>{
+    if(finished)return;finished=true;done.add(current);save();renderNav();
+    const nx=h('div',{class:'next'});
+    if(current<missions.length-1)nx.append(btn('Next mission →',()=>{current++;render();window.scrollTo({top:0,behavior:'smooth'})},'primary'));
+    else nx.append(h('a',{href:'../',class:'btn primary',style:'display:inline-block;text-decoration:none'},'← Back to all chapters'));
+    nx.append(btn('↺ Replay this mission',()=>render()));
+    body.append(nx);
+  }});
+}
+render();
+</script>
+</body>
+</html>
