@@ -77,6 +77,37 @@ input[type=number]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .done-list li{margin:3px 0}
 .ih{color:var(--ihat);font-weight:700}.jh{color:var(--jhat);font-weight:700}
 a{color:var(--accent)}
+/* GUIDE-CSS:START */
+/* ---- guidance layer ---- */
+.gbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.gbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid #c7d2fe;background:#eef2ff;color:#3730a3;border-radius:10px;padding:6px 12px;cursor:pointer}
+.gbtn:hover{filter:brightness(.97)}
+.goalbox{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:4px 0 10px;font-size:14px}
+.goalbox p{margin:3px 0}
+.goalbox .lbl{font-weight:700;margin-right:4px}
+.help{margin-top:8px}
+.help .hbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:10px;padding:6px 12px;cursor:pointer;margin:2px 6px 2px 0}
+.help .hbtn:disabled{opacity:.5;cursor:default}
+.hlevel{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 12px;margin-top:6px;font-size:14px;animation:in .3s ease}
+.hlevel b.t{color:#92400e}
+.hlevel.sol{background:#f0fdf4;border-color:#bbf7d0}
+.hlevel.sol b.t{color:#166534}
+.reallife{background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:10px 14px;margin-top:12px;font-size:14px}
+.reallife h3{margin:0 0 4px;font-size:15px;color:#0369a1}
+.gmodal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-start;justify-content:center;z-index:50;padding:24px 12px;overflow:auto}
+.gmodal .gcard{background:#fff;border-radius:16px;max-width:720px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.gmodal h2{margin:0 0 6px}
+.gmodal h3{font-size:15px;margin:16px 0 6px;color:var(--accent)}
+.gmodal ul{margin:6px 0;padding-left:20px}.gmodal li{margin:3px 0}
+.gmodal .meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.gmodal .meta span{font-size:12px;font-weight:600;background:#f1f5f9;border-radius:999px;padding:3px 10px;color:var(--muted)}
+.gmodal .thread{background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:12px}
+.gmodal table{border-collapse:collapse;width:100%;font-size:14px}
+.gmodal td{border-top:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.gmodal td:first-child{font-weight:700;white-space:nowrap}
+.gmodal dl{margin:0}.gmodal dt{font-weight:700;margin-top:10px}.gmodal dd{margin:2px 0 0;color:#374151;font-size:14px}
+.gmodal .gfoot{margin-top:16px;display:flex;justify-content:flex-end;gap:8px}
+/* GUIDE-CSS:END */
 </style>
 </head>
 <body>
@@ -490,11 +521,11 @@ function render(){
   const b=makeBoard();left.append(b.svg);
   left.append(h('div',{class:'legend'},`<span><i class="sw" style="background:#cbd5e1"></i>original grid</span><span><i class="sw" style="background:#6366f1"></i>moved grid</span><span><i class="sw" style="background:${C.ihat}"></i>î</span><span><i class="sw" style="background:${C.jhat}"></i>ĵ</span><span><i class="sw" style="background:${C.v}"></i>vector</span>`));
   right.append(h('div',{class:'mhead'},`<span class="num">Mission ${current+1} of ${missions.length}</span><span class="chip">${m.concept}</span><span class="chip t">🎬 ${m.time}</span>`));
-  right.append(h('h2',{},m.title));
+  right.append(h('h2',{},m.title));guideMission(right,current);
   const body=h('div');right.append(body);
   let finished=false;
   m.build({b,body,left,complete:()=>{
-    if(finished)return;finished=true;done.add(current);save();renderNav();
+    if(finished)return;finished=true;done.add(current);save();renderNav();guideDone(body,current);
     const nx=h('div',{class:'next'});
     if(current<missions.length-1)nx.append(btn('Next mission →',()=>{current++;render();window.scrollTo({top:0,behavior:'smooth'})},'primary'));
     else nx.append(h('a',{href:'../',class:'btn primary',style:'display:inline-block;text-decoration:none'},'← Back to all chapters'));
@@ -502,7 +533,115 @@ function render(){
     body.append(nx);
   }});
 }
-render();
 </script>
+<!-- GUIDE:START --><script>
+
+const GUIDE={chapter:3,
+intro:{lead:'Grab the whole grid and move it. You\'ll discover that a matrix is just a movement of space.',
+ goals:['See a transformation as every point in space moving','Test whether a transformation is linear','Work out where any vector lands from where î and ĵ land','Read a 2×2 matrix: its columns are where î and ĵ land','Multiply a matrix by a vector without memorising a rule','Build rotation and shear matrices, and spot when a matrix squishes space onto a line'],
+ why:'In Ax = b, A is a matrix and x is a vector. This chapter shows what Ax means: A moves x to a new place.',
+ time:'About 35–45 minutes',prereq:'Chapters 1–2 (vectors, linear combinations, î and ĵ).',
+ thread:'Solving <b>Ax = b</b> means finding the x that the transformation A moves onto b. If A squishes space onto a line (Mission 6), some b can never be reached. That\'s the "no solution" case from ROB 101.'},
+missions:[
+ {goal:'Predict where a vector goes, then watch the whole grid move.',how:'Click the grid where you think v\'s tip will land, press <b>▶ Run the machine</b>, then press <b>▶ Move every point</b>.',
+  help:['The machine turns everything a quarter turn counterclockwise (to the left) around the origin.','A quarter turn left sends "right" to "up" and "up" to "left". So (x, y) goes to (−y, x).','v = (3, 1) lands at (−1, 3).'],
+  real:'Rotating a photo, a map or a robot\'s camera image is a transformation of every point.'},
+ {goal:'Inspect four machines and decide which ones are linear.',how:'Press <b>▶ Run machine</b>, watch the purple grid and the black origin dot, then pick your answer.',
+  help:['Check two things: do all lines stay straight, and does the black origin dot stay put?','Careful: a machine can keep horizontal and vertical lines straight but still bend diagonal lines.','A: curved lines → not linear. B: the origin moves → not linear. C: the diagonal bends → not linear. D: a shear → linear.'],
+  real:'Linear systems are predictable: double the input and you double the output. Engineers check linearity before using these tools.'},
+ {goal:'Work out where v = (−1, 2) lands using only where î and ĵ land.',how:'Press <b>▶ Run</b>, read where î and ĵ land, type where v lands and press <b>Check</b>. Then pick the general formula.',
+  help:['v = −1·î + 2·ĵ. It lands on the same combination of where î and ĵ landed.','î lands at (1, −2) and ĵ at (3, 0). Compute −1·(1, −2) + 2·(3, 0).','(−1, 2) + (6, 0) = (5, 2). General formula: (1x + 3y, −2x + 0y).'],
+  real:'Game engines and CAD software store just a few numbers per object and use them to move every point of a 3D model.'},
+ {goal:'Compute a matrix times a vector using its columns.',how:'Type the result and press <b>Check</b>. The grid then moves to confirm it.',
+  help:['Column 1 (green) is where î lands. Column 2 (red) is where ĵ lands.','Result = x·(column 1) + y·(column 2), where (x, y) is the vector.','Task 1: 1·(2, 1) + 2·(−1, 1) = (0, 3). Task 2: 3·(0, −1) + (−1)·(2, 1) = (−2, −4).'],
+  real:'Every neural-network layer, image filter and robot coordinate change is a matrix–vector multiplication.'},
+ {goal:'Make the rotation and shear matrices by placing î and ĵ.',how:'Click the grid once for where î lands, again for where ĵ lands, then press <b>▶ Test my matrix</b>. Press <b>↺ Reset grid</b> to try again.',
+  help:['Imagine the move. Where does the arrow pointing right (î) end up? Where does the arrow pointing up (ĵ) end up?','Rotating 90° counterclockwise: right → up, up → left. Shear: î stays put, ĵ slides one step right.','Rotation: î at (0, 1), ĵ at (−1, 0). Shear: î at (1, 0), ĵ at (1, 1).'],
+  real:'Rotation matrices control robot joints, phone screen rotation and spacecraft orientation. Shears appear in italic fonts and image warping.'},
+ {goal:'Predict what a matrix does before you watch it.',how:'Type where (1, 1) lands and press <b>Check</b>, then predict what the second matrix does to the grid.',
+  help:['(1, 1) = î + ĵ, so it lands at column 1 + column 2.','For the second matrix, compare its columns: is one a multiple of the other?','(1, 2) + (3, 1) = (4, 3). Second matrix: (−4, −2) = −2·(2, 1), so all of space is squished onto a line.'],
+  real:'A squishing matrix loses information and can\'t be undone. In ROB 101 terms, that\'s when Ax = b has no solution or infinitely many.'},
+ {goal:'Compute random matrix–vector products and read a matrix off an animation.',how:'Type answers and press <b>Check</b>. In round 2, press <b>▶ Play mystery</b> first, then fill in the four boxes.',
+  help:['Always remember: columns = where î and ĵ land.','Matrix × vector = x·(column 1) + y·(column 2). To read a matrix, write where î lands in the green column and where ĵ lands in the red column.','Example: [1 2; 0 −1] times (2, 1) = 2·(1, 0) + 1·(2, −1) = (4, −1). Final question: a matrix is a transformation of space.'],
+  real:'Once you see matrices as movements, the rest of linear algebra (determinants, inverses, eigenvectors) becomes much easier.'}
+]};
+
+/* ---------- guidance layer: intro, goals, 3-level help, glossary, real life ---------- */
+const GLOSSARY=[
+ [1,'Vector','An arrow from the origin, or a list of numbers like [3; 2]. Both views describe the same thing.'],
+ [1,'Coordinates','The numbers in a vector. The first says how far along x (right/left), the second how far along y (up/down).'],
+ [1,'Origin','The point (0, 0) where the axes cross. Vectors start here.'],
+ [1,'Scalar','An ordinary number used to stretch, shrink or flip a vector.'],
+ [1,'Vector addition','Put the second arrow\'s tail on the first arrow\'s tip, or add the matching numbers: [1; 2] + [3; −1] = [4; 1].'],
+ [1,'Scaling','Multiplying a vector by a scalar. Every number in the vector gets multiplied.'],
+ [1,'Movement (displacement)','The vector from a start point to a target: target − start.'],
+ [2,'Basis vectors î and ĵ','î is the arrow 1 unit right, ĵ is 1 unit up. Coordinates say how much of each you use.'],
+ [2,'Linear combination','Scaling some vectors and adding them: a·v₁ + b·v₂.'],
+ [2,'Span','Every vector you can reach with linear combinations of a set of vectors.'],
+ [2,'Linearly dependent','At least one vector is redundant: it can be built from the others, so removing it doesn\'t shrink the span.'],
+ [2,'Linearly independent','Every vector adds a new direction. None can be built from the others.'],
+ [2,'Basis','A set of linearly independent vectors that span the space. Every vector then has exactly one set of coordinates.'],
+ [3,'Transformation','A function that takes in a vector and outputs a vector. Picture it as every point in space moving.'],
+ [3,'Linear transformation','A transformation that keeps lines straight and the origin fixed. Grid lines stay parallel and evenly spaced.'],
+ [3,'Matrix','A grid of numbers describing a linear transformation. Its columns are where î and ĵ land.'],
+ [3,'Matrix × vector','x·(column 1) + y·(column 2): applies the transformation to the vector (x, y).'],
+ [3,'Rotation','Turns space around the origin. 90° counterclockwise is [0 −1; 1 0].'],
+ [3,'Shear','Keeps î fixed and slides ĵ sideways, slanting the grid. Example: [1 1; 0 1].'],
+ [4,'Composition','Applying one transformation, then another. The result is one new transformation.'],
+ [4,'Matrix product','The matrix of a composition. In AB, B acts first, then A (read right to left).'],
+ [4,'Commutative','Order doesn\'t matter (AB = BA). Matrix multiplication is usually NOT commutative.'],
+ [4,'Associative','Grouping doesn\'t matter: (AB)C = A(BC). Matrix multiplication IS associative.'],
+];
+function gModal(html,footer){
+  const m=h('div',{class:'gmodal',role:'dialog','aria-modal':'true'});const c=h('div',{class:'gcard'},html);
+  const f=h('div',{class:'gfoot'});const close=()=>{m.remove();document.removeEventListener('keydown',esc)};
+  const esc=e=>{if(e.key==='Escape')close()};
+  f.append(h('button',{class:'btn primary',onclick:close},footer||'Close'));c.append(f);m.append(c);
+  m.addEventListener('click',e=>{if(e.target===m)close()});document.addEventListener('keydown',esc);document.body.append(m);
+  return m;
+}
+function openIntro(){
+  const G=GUIDE.intro;
+  gModal(`<h2>📘 What you'll learn</h2><p>${G.lead}</p>
+    <div class="meta"><span>⏱ ${G.time}</span><span>✅ Before you start: ${G.prereq}</span></div>
+    <h3>By the end you can…</h3><ul>${G.goals.map(g=>`<li>${g}</li>`).join('')}</ul>
+    <h3>Why it matters</h3><p>${G.why}</p>
+    <h3>The missions</h3><table>${missions.map((m,i)=>`<tr><td>${i+1}. ${m.title}</td><td>${GUIDE.missions[i].goal}</td></tr>`).join('')}</table>
+    <h3>How each mission works</h3><p>Read the 🎯 goal, <b>predict</b> before anything moves, try it, and read the feedback. Stuck? Press <b>💡 Need help?</b> anytime: first a nudge, then a bigger hint, then the full worked solution.</p>
+    <div class="thread"><b>🧵 The big picture:</b> ${G.thread}</div>`,"Let's start →");
+}
+function openGloss(){
+  const terms=GLOSSARY.filter(t=>t[0]<=GUIDE.chapter);
+  gModal(`<h2>📖 Glossary</h2><p class="muted">Key words up to this chapter.</p><dl>${terms.map(t=>`<dt>${t[1]} <span class="muted" style="font-weight:400">(Ch ${t[0]})</span></dt><dd>${t[2]}</dd>`).join('')}</dl>`);
+}
+function guideMission(container,i){
+  const g=GUIDE.missions[i];if(!g)return;
+  const box=h('div',{class:'goalbox'},`<p><span class="lbl">🎯 Goal:</span>${g.goal}</p><p><span class="lbl">🛠 How:</span>${g.how}</p>`);
+  const help=h('div',{class:'help'});const levels=h('div');
+  const names=['💡 Need help?','🔍 Bigger hint','✍️ Show worked solution'];const titles=['Nudge','Hint','Worked solution'];let lvl=0;
+  const b=h('button',{class:'hbtn'},names[0]);
+  b.addEventListener('click',()=>{
+    if(lvl>=3)return;
+    levels.append(h('div',{class:'hlevel'+(lvl===2?' sol':'')},`<b class="t">${titles[lvl]}:</b> ${g.help[lvl]}`));
+    lvl++;if(lvl<3)b.textContent=names[lvl];else{b.textContent='All help shown';b.disabled=true}
+  });
+  help.append(b,levels);box.append(help);container.append(box);
+}
+function guideDone(container,i){
+  const g=GUIDE.missions[i];if(!g||!g.real)return;
+  container.append(h('div',{class:'reallife'},`<h3>🌍 In real life</h3>${g.real}`));
+}
+function guideInit(){
+  const loop=document.querySelector('header .loop');
+  const bar=h('div',{class:'gbar'});
+  bar.append(h('button',{class:'gbtn',onclick:openIntro},'📘 What you\'ll learn'),h('button',{class:'gbtn',onclick:openGloss},'📖 Glossary'));
+  loop.after(bar);
+  const key='vlab'+GUIDE.chapter+'-intro-seen';let seen=false;try{seen=localStorage.getItem(key)==='1';localStorage.setItem(key,'1')}catch(e){}
+  if(!seen)openIntro();
+}
+
+guideInit();render();
+</script><!-- GUIDE:END -->
+
 </body>
 </html>

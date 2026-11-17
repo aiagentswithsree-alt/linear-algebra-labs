@@ -79,6 +79,37 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .done-list{margin:8px 0 0;padding-left:20px}
 .done-list li{margin:3px 0}
 a{color:var(--accent)}
+/* GUIDE-CSS:START */
+/* ---- guidance layer ---- */
+.gbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.gbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid #c7d2fe;background:#eef2ff;color:#3730a3;border-radius:10px;padding:6px 12px;cursor:pointer}
+.gbtn:hover{filter:brightness(.97)}
+.goalbox{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:4px 0 10px;font-size:14px}
+.goalbox p{margin:3px 0}
+.goalbox .lbl{font-weight:700;margin-right:4px}
+.help{margin-top:8px}
+.help .hbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:10px;padding:6px 12px;cursor:pointer;margin:2px 6px 2px 0}
+.help .hbtn:disabled{opacity:.5;cursor:default}
+.hlevel{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 12px;margin-top:6px;font-size:14px;animation:in .3s ease}
+.hlevel b.t{color:#92400e}
+.hlevel.sol{background:#f0fdf4;border-color:#bbf7d0}
+.hlevel.sol b.t{color:#166534}
+.reallife{background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:10px 14px;margin-top:12px;font-size:14px}
+.reallife h3{margin:0 0 4px;font-size:15px;color:#0369a1}
+.gmodal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-start;justify-content:center;z-index:50;padding:24px 12px;overflow:auto}
+.gmodal .gcard{background:#fff;border-radius:16px;max-width:720px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.gmodal h2{margin:0 0 6px}
+.gmodal h3{font-size:15px;margin:16px 0 6px;color:var(--accent)}
+.gmodal ul{margin:6px 0;padding-left:20px}.gmodal li{margin:3px 0}
+.gmodal .meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.gmodal .meta span{font-size:12px;font-weight:600;background:#f1f5f9;border-radius:999px;padding:3px 10px;color:var(--muted)}
+.gmodal .thread{background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:12px}
+.gmodal table{border-collapse:collapse;width:100%;font-size:14px}
+.gmodal td{border-top:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.gmodal td:first-child{font-weight:700;white-space:nowrap}
+.gmodal dl{margin:0}.gmodal dt{font-weight:700;margin-top:10px}.gmodal dd{margin:2px 0 0;color:#374151;font-size:14px}
+.gmodal .gfoot{margin-top:16px;display:flex;justify-content:flex-end;gap:8px}
+/* GUIDE-CSS:END */
 </style>
 </head>
 <body>
@@ -590,11 +621,11 @@ function render(){
   const b=makeBoard();left.append(b.svg);
   left.append(h('div',{class:'legend'},`<span><i class="sw" style="background:${C.accent}"></i>a × first arrow</span><span><i class="sw" style="background:${C.accent2}"></i>b × second arrow</span><span><i class="sw" style="background:${C.ok}"></i>result</span><span>1 square = 1 m</span>`));
   right.append(h('div',{class:'mhead'},`<span class="num">Mission ${current+1} of ${missions.length}</span><span class="chip">${m.concept}</span><span class="chip t">🎬 ${m.time}</span>`));
-  right.append(h('h2',{},m.title));
+  right.append(h('h2',{},m.title));guideMission(right,current);
   const body=h('div');right.append(body);
   let finished=false;
   m.build({b,body,left,complete:()=>{
-    if(finished)return;finished=true;done.add(current);save();renderNav();
+    if(finished)return;finished=true;done.add(current);save();renderNav();guideDone(body,current);
     const nx=h('div',{class:'next'});
     if(current<missions.length-1)nx.append(btn('Next mission →',()=>{current++;render();window.scrollTo({top:0,behavior:'smooth'})},'primary'));
     else nx.append(h('a',{href:'../',class:'btn primary',style:'display:inline-block;text-decoration:none'},'← Back to all chapters'));
@@ -602,7 +633,115 @@ function render(){
     body.append(nx);
   }});
 }
-render();
 </script>
+<!-- GUIDE:START --><script>
+
+const GUIDE={chapter:2,
+intro:{lead:'Steer the robot with two knobs and discover which places it can reach, and when a knob is useless.',
+ goals:['Read coordinates as amounts of the basis vectors î and ĵ','Use a different pair of basis vectors and see why the numbers change','Build linear combinations a·v₁ + b·v₂','Predict the span of two vectors: the whole plane, a line, or a single point','Tell linearly dependent vectors from independent ones, in 2D and 3D','Explain what a basis is: independent vectors that span the space'],
+ why:'Span answers "can I reach this target with these building blocks?" That is exactly the question behind "does Ax = b have a solution?"',
+ time:'About 30–40 minutes',prereq:'Chapter 1 (vectors, adding, scaling).',
+ thread:'In <b>Ax = b</b>, b can be reached exactly when it lies in the <b>span</b> of A\'s columns. This chapter teaches you span; chapter 3 shows what A does.'},
+missions:[
+ {goal:'Set knobs a and b so that a·î + b·ĵ reaches the parcel.',how:'Drag sliders <b>a</b> and <b>b</b> (the green dot shows where you\'ll land), then press <b>▶ Send robot</b>. In task 2, type the knob values.',
+  help:['Knob a stretches the green arrow î (1 step right). Knob b stretches the red arrow ĵ (1 step up).','The knob values are just the parcel\'s coordinates: a = x, b = y.','Parcel (3, −2) → a = 3, b = −2. Parcel (−2, 1.5) → a = −2, b = 1.5.'],
+  real:'Every pixel position and every spreadsheet row is "this much of one direction plus that much of another".'},
+ {goal:'Reach the parcel using the tilted arrows v₁ = [1; 1] and v₂ = [1; −1].',how:'Drag <b>a</b> and <b>b</b>, follow the purple tilted grid, and press <b>▶ Send robot</b>. Then answer the question.',
+  help:['Ignore the normal grid. Count steps along the purple tilted grid: along v₁ (up-right) and along v₂ (down-right).','You need a·(1, 1) + b·(1, −1) = parcel, so a + b = x and a − b = y. That gives a = (x + y) ÷ 2 and b = (x − y) ÷ 2.','(3, 1) → a = 2, b = 1. (0, 2) → a = 1, b = −1. The question: both sets of numbers are valid, because the numbers depend on the basis.'],
+  real:'Robots switch between a "world" frame and their own "body" frame. The same point gets different numbers depending on the basis.'},
+ {goal:'See that fixing one knob and turning the other draws a straight line.',how:'Answer the prediction, press <b>▶ Spin knob a</b>, then drag both sliders until the green dot lands on (1, 3).',
+  help:['Each step of the spinning knob adds the same arrow again, so the tip moves in equal steps in one direction.','For (1, 3) you need a·(2, 1) + b·(−1, 2) = (1, 3). Try small whole numbers.','a = 1, b = 1: (2, 1) + (−1, 2) = (1, 3).'],
+  real:'Mixing two ingredients or two paint colours in different amounts is a linear combination.'},
+ {goal:'Predict which parcels lie in the span of the two arrows.',how:'Tick the parcels you think are reachable, then press <b>Check, then sweep every combination</b>.',
+  help:['Do the two arrows point in different directions, or along the same line?','Different directions → they reach the whole plane. Same line → only points on that line. Both zero → only the origin.','Case A: P, Q and R are all reachable. Case B: v₂ = −2·v₁, so only P and R (on the line y = 2x). Case C: only P (the origin).'],
+  real:'Checking whether a robot with two motors can reach every position, or whether a set of data features can explain every outcome.'},
+ {goal:'Find out when an extra arrow adds nothing new.',how:'Type numbers and press <b>Check</b>, then answer the questions.',
+  help:['Can you build w = (1, 1) out of u = (1, 0) and v = (0, 1)?','If one vector can be built from the others, it\'s redundant (dependent). For p and q: is q a multiple of p?','w = 1·u + 1·v, so p = 1, q = 1, and removing w loses nothing. q = (−4, −2) = −2·(2, 1), so k = −2. (2, 1) and (1, 2) are independent: no single k works.'],
+  real:'Redundant sensors or duplicate data columns add cost but no new information. Spotting dependence saves money and avoids errors.'},
+ {goal:'Predict the span of two, then three, arrows in 3D space.',how:'Drag the 3D picture to rotate it. Answer each prediction to see the result.',
+  help:['Two arrows in different directions can only cover two directions of movement.','A third arrow only helps if it points out of the sheet made by the first two.','Stage 1: a plane. Stage 2: still the same plane, because v₃ = v₁ + v₂ lies in it. Stage 3: all of 3D space.'],
+  real:'A drone needs three independent thrust directions to move anywhere in 3D. With only two, it is stuck on a plane.'},
+ {goal:'Find knob values for new arrows, and spot the impossible round.',how:'Type <b>a</b> and <b>b</b> and press <b>Send</b>, or press <b>It\'s unreachable</b> if no values work. Then answer the basis puzzle.',
+  help:['First check: are v₁ and v₂ multiples of each other? If yes, only points on their line can be reached.','Otherwise solve a·v₁ + b·v₂ = parcel: match the x parts and the y parts to get two small equations.','Example: v₁ = (1, 0), v₂ = (1, 1), parcel (3, 2). The y parts give b = 2, then the x parts give a + 2 = 3, so a = 1. Basis puzzle: spanning means everything is reachable, and independence means each point has exactly one set of coordinates.'],
+  real:'Choosing a good basis is how image compression (JPEG) and machine learning (PCA) describe data with fewer numbers.'}
+]};
+
+/* ---------- guidance layer: intro, goals, 3-level help, glossary, real life ---------- */
+const GLOSSARY=[
+ [1,'Vector','An arrow from the origin, or a list of numbers like [3; 2]. Both views describe the same thing.'],
+ [1,'Coordinates','The numbers in a vector. The first says how far along x (right/left), the second how far along y (up/down).'],
+ [1,'Origin','The point (0, 0) where the axes cross. Vectors start here.'],
+ [1,'Scalar','An ordinary number used to stretch, shrink or flip a vector.'],
+ [1,'Vector addition','Put the second arrow\'s tail on the first arrow\'s tip, or add the matching numbers: [1; 2] + [3; −1] = [4; 1].'],
+ [1,'Scaling','Multiplying a vector by a scalar. Every number in the vector gets multiplied.'],
+ [1,'Movement (displacement)','The vector from a start point to a target: target − start.'],
+ [2,'Basis vectors î and ĵ','î is the arrow 1 unit right, ĵ is 1 unit up. Coordinates say how much of each you use.'],
+ [2,'Linear combination','Scaling some vectors and adding them: a·v₁ + b·v₂.'],
+ [2,'Span','Every vector you can reach with linear combinations of a set of vectors.'],
+ [2,'Linearly dependent','At least one vector is redundant: it can be built from the others, so removing it doesn\'t shrink the span.'],
+ [2,'Linearly independent','Every vector adds a new direction. None can be built from the others.'],
+ [2,'Basis','A set of linearly independent vectors that span the space. Every vector then has exactly one set of coordinates.'],
+ [3,'Transformation','A function that takes in a vector and outputs a vector. Picture it as every point in space moving.'],
+ [3,'Linear transformation','A transformation that keeps lines straight and the origin fixed. Grid lines stay parallel and evenly spaced.'],
+ [3,'Matrix','A grid of numbers describing a linear transformation. Its columns are where î and ĵ land.'],
+ [3,'Matrix × vector','x·(column 1) + y·(column 2): applies the transformation to the vector (x, y).'],
+ [3,'Rotation','Turns space around the origin. 90° counterclockwise is [0 −1; 1 0].'],
+ [3,'Shear','Keeps î fixed and slides ĵ sideways, slanting the grid. Example: [1 1; 0 1].'],
+ [4,'Composition','Applying one transformation, then another. The result is one new transformation.'],
+ [4,'Matrix product','The matrix of a composition. In AB, B acts first, then A (read right to left).'],
+ [4,'Commutative','Order doesn\'t matter (AB = BA). Matrix multiplication is usually NOT commutative.'],
+ [4,'Associative','Grouping doesn\'t matter: (AB)C = A(BC). Matrix multiplication IS associative.'],
+];
+function gModal(html,footer){
+  const m=h('div',{class:'gmodal',role:'dialog','aria-modal':'true'});const c=h('div',{class:'gcard'},html);
+  const f=h('div',{class:'gfoot'});const close=()=>{m.remove();document.removeEventListener('keydown',esc)};
+  const esc=e=>{if(e.key==='Escape')close()};
+  f.append(h('button',{class:'btn primary',onclick:close},footer||'Close'));c.append(f);m.append(c);
+  m.addEventListener('click',e=>{if(e.target===m)close()});document.addEventListener('keydown',esc);document.body.append(m);
+  return m;
+}
+function openIntro(){
+  const G=GUIDE.intro;
+  gModal(`<h2>📘 What you'll learn</h2><p>${G.lead}</p>
+    <div class="meta"><span>⏱ ${G.time}</span><span>✅ Before you start: ${G.prereq}</span></div>
+    <h3>By the end you can…</h3><ul>${G.goals.map(g=>`<li>${g}</li>`).join('')}</ul>
+    <h3>Why it matters</h3><p>${G.why}</p>
+    <h3>The missions</h3><table>${missions.map((m,i)=>`<tr><td>${i+1}. ${m.title}</td><td>${GUIDE.missions[i].goal}</td></tr>`).join('')}</table>
+    <h3>How each mission works</h3><p>Read the 🎯 goal, <b>predict</b> before anything moves, try it, and read the feedback. Stuck? Press <b>💡 Need help?</b> anytime: first a nudge, then a bigger hint, then the full worked solution.</p>
+    <div class="thread"><b>🧵 The big picture:</b> ${G.thread}</div>`,"Let's start →");
+}
+function openGloss(){
+  const terms=GLOSSARY.filter(t=>t[0]<=GUIDE.chapter);
+  gModal(`<h2>📖 Glossary</h2><p class="muted">Key words up to this chapter.</p><dl>${terms.map(t=>`<dt>${t[1]} <span class="muted" style="font-weight:400">(Ch ${t[0]})</span></dt><dd>${t[2]}</dd>`).join('')}</dl>`);
+}
+function guideMission(container,i){
+  const g=GUIDE.missions[i];if(!g)return;
+  const box=h('div',{class:'goalbox'},`<p><span class="lbl">🎯 Goal:</span>${g.goal}</p><p><span class="lbl">🛠 How:</span>${g.how}</p>`);
+  const help=h('div',{class:'help'});const levels=h('div');
+  const names=['💡 Need help?','🔍 Bigger hint','✍️ Show worked solution'];const titles=['Nudge','Hint','Worked solution'];let lvl=0;
+  const b=h('button',{class:'hbtn'},names[0]);
+  b.addEventListener('click',()=>{
+    if(lvl>=3)return;
+    levels.append(h('div',{class:'hlevel'+(lvl===2?' sol':'')},`<b class="t">${titles[lvl]}:</b> ${g.help[lvl]}`));
+    lvl++;if(lvl<3)b.textContent=names[lvl];else{b.textContent='All help shown';b.disabled=true}
+  });
+  help.append(b,levels);box.append(help);container.append(box);
+}
+function guideDone(container,i){
+  const g=GUIDE.missions[i];if(!g||!g.real)return;
+  container.append(h('div',{class:'reallife'},`<h3>🌍 In real life</h3>${g.real}`));
+}
+function guideInit(){
+  const loop=document.querySelector('header .loop');
+  const bar=h('div',{class:'gbar'});
+  bar.append(h('button',{class:'gbtn',onclick:openIntro},'📘 What you\'ll learn'),h('button',{class:'gbtn',onclick:openGloss},'📖 Glossary'));
+  loop.after(bar);
+  const key='vlab'+GUIDE.chapter+'-intro-seen';let seen=false;try{seen=localStorage.getItem(key)==='1';localStorage.setItem(key,'1')}catch(e){}
+  if(!seen)openIntro();
+}
+
+guideInit();render();
+</script><!-- GUIDE:END -->
+
 </body>
 </html>

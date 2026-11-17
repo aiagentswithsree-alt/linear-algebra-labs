@@ -77,6 +77,37 @@ input[type=number]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .done-list li{margin:3px 0}
 .ih{color:var(--ihat);font-weight:700}.jh{color:var(--jhat);font-weight:700}
 a{color:var(--accent)}
+/* GUIDE-CSS:START */
+/* ---- guidance layer ---- */
+.gbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.gbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid #c7d2fe;background:#eef2ff;color:#3730a3;border-radius:10px;padding:6px 12px;cursor:pointer}
+.gbtn:hover{filter:brightness(.97)}
+.goalbox{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:4px 0 10px;font-size:14px}
+.goalbox p{margin:3px 0}
+.goalbox .lbl{font-weight:700;margin-right:4px}
+.help{margin-top:8px}
+.help .hbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:10px;padding:6px 12px;cursor:pointer;margin:2px 6px 2px 0}
+.help .hbtn:disabled{opacity:.5;cursor:default}
+.hlevel{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 12px;margin-top:6px;font-size:14px;animation:in .3s ease}
+.hlevel b.t{color:#92400e}
+.hlevel.sol{background:#f0fdf4;border-color:#bbf7d0}
+.hlevel.sol b.t{color:#166534}
+.reallife{background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:10px 14px;margin-top:12px;font-size:14px}
+.reallife h3{margin:0 0 4px;font-size:15px;color:#0369a1}
+.gmodal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-start;justify-content:center;z-index:50;padding:24px 12px;overflow:auto}
+.gmodal .gcard{background:#fff;border-radius:16px;max-width:720px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.gmodal h2{margin:0 0 6px}
+.gmodal h3{font-size:15px;margin:16px 0 6px;color:var(--accent)}
+.gmodal ul{margin:6px 0;padding-left:20px}.gmodal li{margin:3px 0}
+.gmodal .meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.gmodal .meta span{font-size:12px;font-weight:600;background:#f1f5f9;border-radius:999px;padding:3px 10px;color:var(--muted)}
+.gmodal .thread{background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:12px}
+.gmodal table{border-collapse:collapse;width:100%;font-size:14px}
+.gmodal td{border-top:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.gmodal td:first-child{font-weight:700;white-space:nowrap}
+.gmodal dl{margin:0}.gmodal dt{font-weight:700;margin-top:10px}.gmodal dd{margin:2px 0 0;color:#374151;font-size:14px}
+.gmodal .gfoot{margin-top:16px;display:flex;justify-content:flex-end;gap:8px}
+/* GUIDE-CSS:END */
 </style>
 </head>
 <body>
@@ -458,11 +489,11 @@ function render(){
   const b=makeBoard();left.append(b.svg);
   left.append(h('div',{class:'legend'},`<span><i class="sw" style="background:#cbd5e1"></i>original grid</span><span><i class="sw" style="background:#6366f1"></i>moved grid</span><span><i class="sw" style="background:${C.ihat}"></i>î</span><span><i class="sw" style="background:${C.jhat}"></i>ĵ</span><span><i class="sw" style="background:${C.v}"></i>vector</span>`));
   right.append(h('div',{class:'mhead'},`<span class="num">Mission ${current+1} of ${missions.length}</span><span class="chip">${m.concept}</span><span class="chip t">🎬 ${m.time}</span>`));
-  right.append(h('h2',{},m.title));
+  right.append(h('h2',{},m.title));guideMission(right,current);
   const body=h('div');right.append(body);
   let finished=false;
   m.build({b,body,left,complete:()=>{
-    if(finished)return;finished=true;done.add(current);save();renderNav();
+    if(finished)return;finished=true;done.add(current);save();renderNav();guideDone(body,current);
     const nx=h('div',{class:'next'});
     if(current<missions.length-1)nx.append(btn('Next mission →',()=>{current++;render();window.scrollTo({top:0,behavior:'smooth'})},'primary'));
     else nx.append(h('a',{href:'../',class:'btn primary',style:'display:inline-block;text-decoration:none'},'← Back to all chapters'));
@@ -470,7 +501,115 @@ function render(){
     body.append(nx);
   }});
 }
-render();
 </script>
+<!-- GUIDE:START --><script>
+
+const GUIDE={chapter:4,
+intro:{lead:'Do one transformation, then another. The combined move is a new matrix: the product.',
+ goals:['Describe two transformations in a row as one composition matrix','Explain why that matrix is called the product, and read products right to left','Multiply two matrices by following î and ĵ','Use the rule: each column of AB is A × (that column of B)','See that order matters (AB ≠ BA)','Explain why (AB)C = A(BC)'],
+ why:'Real systems chain moves. A robot arm\'s shoulder, elbow and wrist each rotate; multiplying their matrices gives one matrix for the whole arm.',
+ time:'About 35–45 minutes',prereq:'Chapter 3 (matrices as transformations, matrix × vector).',
+ thread:'In chapter 7 you\'ll <b>undo</b> a transformation (the inverse matrix) to solve <b>Ax = b</b>. Undoing means composing with another matrix to get back to "do nothing", so composition is the key idea.'},
+missions:[
+ {goal:'Refresh: where î lands, and matrix × vector.',how:'Pick the answer, then type the result and press <b>Check</b>.',
+  help:['Landing spots are columns, not rows.','î lands on the first column. M·v = x·(column 1) + y·(column 2).','î lands at (3, 0). [3 1; 0 2]·(1, 2) = 1·(3, 0) + 2·(1, 2) = (5, 4).'],
+  real:'This is the core move inside every graphics, robotics and machine-learning library.'},
+ {goal:'Find one matrix that does "rotate, then shear" in a single step.',how:'Press <b>▶ Rotate, then shear</b>, read where î and ĵ end up, fill in the four boxes and press <b>Check</b>.',
+  help:['Only the final positions matter, after both moves.','Read the green arrow tip (î) and the red arrow tip (ĵ) against the light grey grid. Write them as columns: green boxes for î, red boxes for ĵ.','î ends at (1, 1) and ĵ at (−1, 0), so the matrix is [1 −1; 1 0].'],
+  real:'For a robot arm with two joints, one combined matrix tells you where the hand ends up.'},
+ {goal:'Show that applying two matrices one by one equals applying their product once.',how:'Type each result and press <b>Check</b>, then answer which matrix acts first.',
+  help:['Step 1 uses the rotation matrix on (1, 2). Step 2 uses the shear on that answer.','Each time: matrix × vector = x·(column 1) + y·(column 2).','Rotation·(1, 2) = (−2, 1). Shear·(−2, 1) = (−1, 1). Composition·(1, 2) = (−1, 1). The matrix on the right (the rotation) acts first.'],
+  real:'Computers pre-multiply chains of matrices so they can apply one matrix instead of many, which is much faster for millions of points.'},
+ {goal:'Compute M₂M₁ using only the numbers, by following î and ĵ.',how:'Answer the four small steps in order, then press <b>▶ Apply M₁, then M₂</b> to check.',
+  help:['î first lands on M₁\'s first column. Then M₂ moves it.','Each column of M₂M₁ = M₂ × (that column of M₁).','î: (1, 1) → M₂·(1, 1) = (2, 1). ĵ: (−2, 0) → M₂·(−2, 0) = (0, −2). So the product is [2 0; 1 −2].'],
+  real:'Robotics software computes where a robot\'s hand is ("forward kinematics") by chaining each joint\'s matrix exactly like this.'},
+ {goal:'Find the general rule for multiplying matrices, then use it.',how:'Answer the two questions, then fill in the four boxes and press <b>Check</b>.',
+  help:['The right matrix acts first, so î first goes to the right matrix\'s first column.','First column of AB = A × (first column of B). Second column of AB = A × (second column of B).','[2 0; 1 1]·(1, 1) = (2, 2) and [2 0; 1 1]·(−1, 2) = (−2, 1), so AB = [2 −2; 2 1].'],
+  real:'Every matrix multiplication on a GPU, in games and in AI models, follows this column rule.'},
+ {goal:'Compare shear-then-rotate with rotate-then-shear.',how:'Make your prediction and watch both orders (the dashed arrows show the first result). Then pick the right product.',
+  help:['Picture where î and ĵ end up in each order.','Shear-then-rotate puts î at (0, 1). Rotate-then-shear puts it at (1, 1). Different!','The results differ, so AB ≠ BA. "Shear first, then rotate" = Rotation × Shear (the shear sits on the right).'],
+  real:'Turning then driving forward is not the same as driving forward then turning. Order matters for robots too.'},
+ {goal:'Understand why (AB)C = A(BC), then multiply random matrices.',how:'Answer the prediction and the "why" question, then fill in the boxes for two random products.',
+  help:['Both groupings still apply C first, then B, then A.','For each product: first column = left matrix × (right matrix\'s first column); second column = left matrix × (right matrix\'s second column).','Example: [1 2; 0 1]·[1 0; 1 1]. Left × (1, 1) = 1·(1, 0) + 1·(2, 1) = (3, 1). Left × (0, 1) = (2, 1). So the product is [3 2; 1 1].'],
+  real:'Because grouping doesn\'t matter, computers multiply long chains of matrices in whichever grouping is fastest.'}
+]};
+
+/* ---------- guidance layer: intro, goals, 3-level help, glossary, real life ---------- */
+const GLOSSARY=[
+ [1,'Vector','An arrow from the origin, or a list of numbers like [3; 2]. Both views describe the same thing.'],
+ [1,'Coordinates','The numbers in a vector. The first says how far along x (right/left), the second how far along y (up/down).'],
+ [1,'Origin','The point (0, 0) where the axes cross. Vectors start here.'],
+ [1,'Scalar','An ordinary number used to stretch, shrink or flip a vector.'],
+ [1,'Vector addition','Put the second arrow\'s tail on the first arrow\'s tip, or add the matching numbers: [1; 2] + [3; −1] = [4; 1].'],
+ [1,'Scaling','Multiplying a vector by a scalar. Every number in the vector gets multiplied.'],
+ [1,'Movement (displacement)','The vector from a start point to a target: target − start.'],
+ [2,'Basis vectors î and ĵ','î is the arrow 1 unit right, ĵ is 1 unit up. Coordinates say how much of each you use.'],
+ [2,'Linear combination','Scaling some vectors and adding them: a·v₁ + b·v₂.'],
+ [2,'Span','Every vector you can reach with linear combinations of a set of vectors.'],
+ [2,'Linearly dependent','At least one vector is redundant: it can be built from the others, so removing it doesn\'t shrink the span.'],
+ [2,'Linearly independent','Every vector adds a new direction. None can be built from the others.'],
+ [2,'Basis','A set of linearly independent vectors that span the space. Every vector then has exactly one set of coordinates.'],
+ [3,'Transformation','A function that takes in a vector and outputs a vector. Picture it as every point in space moving.'],
+ [3,'Linear transformation','A transformation that keeps lines straight and the origin fixed. Grid lines stay parallel and evenly spaced.'],
+ [3,'Matrix','A grid of numbers describing a linear transformation. Its columns are where î and ĵ land.'],
+ [3,'Matrix × vector','x·(column 1) + y·(column 2): applies the transformation to the vector (x, y).'],
+ [3,'Rotation','Turns space around the origin. 90° counterclockwise is [0 −1; 1 0].'],
+ [3,'Shear','Keeps î fixed and slides ĵ sideways, slanting the grid. Example: [1 1; 0 1].'],
+ [4,'Composition','Applying one transformation, then another. The result is one new transformation.'],
+ [4,'Matrix product','The matrix of a composition. In AB, B acts first, then A (read right to left).'],
+ [4,'Commutative','Order doesn\'t matter (AB = BA). Matrix multiplication is usually NOT commutative.'],
+ [4,'Associative','Grouping doesn\'t matter: (AB)C = A(BC). Matrix multiplication IS associative.'],
+];
+function gModal(html,footer){
+  const m=h('div',{class:'gmodal',role:'dialog','aria-modal':'true'});const c=h('div',{class:'gcard'},html);
+  const f=h('div',{class:'gfoot'});const close=()=>{m.remove();document.removeEventListener('keydown',esc)};
+  const esc=e=>{if(e.key==='Escape')close()};
+  f.append(h('button',{class:'btn primary',onclick:close},footer||'Close'));c.append(f);m.append(c);
+  m.addEventListener('click',e=>{if(e.target===m)close()});document.addEventListener('keydown',esc);document.body.append(m);
+  return m;
+}
+function openIntro(){
+  const G=GUIDE.intro;
+  gModal(`<h2>📘 What you'll learn</h2><p>${G.lead}</p>
+    <div class="meta"><span>⏱ ${G.time}</span><span>✅ Before you start: ${G.prereq}</span></div>
+    <h3>By the end you can…</h3><ul>${G.goals.map(g=>`<li>${g}</li>`).join('')}</ul>
+    <h3>Why it matters</h3><p>${G.why}</p>
+    <h3>The missions</h3><table>${missions.map((m,i)=>`<tr><td>${i+1}. ${m.title}</td><td>${GUIDE.missions[i].goal}</td></tr>`).join('')}</table>
+    <h3>How each mission works</h3><p>Read the 🎯 goal, <b>predict</b> before anything moves, try it, and read the feedback. Stuck? Press <b>💡 Need help?</b> anytime: first a nudge, then a bigger hint, then the full worked solution.</p>
+    <div class="thread"><b>🧵 The big picture:</b> ${G.thread}</div>`,"Let's start →");
+}
+function openGloss(){
+  const terms=GLOSSARY.filter(t=>t[0]<=GUIDE.chapter);
+  gModal(`<h2>📖 Glossary</h2><p class="muted">Key words up to this chapter.</p><dl>${terms.map(t=>`<dt>${t[1]} <span class="muted" style="font-weight:400">(Ch ${t[0]})</span></dt><dd>${t[2]}</dd>`).join('')}</dl>`);
+}
+function guideMission(container,i){
+  const g=GUIDE.missions[i];if(!g)return;
+  const box=h('div',{class:'goalbox'},`<p><span class="lbl">🎯 Goal:</span>${g.goal}</p><p><span class="lbl">🛠 How:</span>${g.how}</p>`);
+  const help=h('div',{class:'help'});const levels=h('div');
+  const names=['💡 Need help?','🔍 Bigger hint','✍️ Show worked solution'];const titles=['Nudge','Hint','Worked solution'];let lvl=0;
+  const b=h('button',{class:'hbtn'},names[0]);
+  b.addEventListener('click',()=>{
+    if(lvl>=3)return;
+    levels.append(h('div',{class:'hlevel'+(lvl===2?' sol':'')},`<b class="t">${titles[lvl]}:</b> ${g.help[lvl]}`));
+    lvl++;if(lvl<3)b.textContent=names[lvl];else{b.textContent='All help shown';b.disabled=true}
+  });
+  help.append(b,levels);box.append(help);container.append(box);
+}
+function guideDone(container,i){
+  const g=GUIDE.missions[i];if(!g||!g.real)return;
+  container.append(h('div',{class:'reallife'},`<h3>🌍 In real life</h3>${g.real}`));
+}
+function guideInit(){
+  const loop=document.querySelector('header .loop');
+  const bar=h('div',{class:'gbar'});
+  bar.append(h('button',{class:'gbtn',onclick:openIntro},'📘 What you\'ll learn'),h('button',{class:'gbtn',onclick:openGloss},'📖 Glossary'));
+  loop.after(bar);
+  const key='vlab'+GUIDE.chapter+'-intro-seen';let seen=false;try{seen=localStorage.getItem(key)==='1';localStorage.setItem(key,'1')}catch(e){}
+  if(!seen)openIntro();
+}
+
+guideInit();render();
+</script><!-- GUIDE:END -->
+
 </body>
 </html>

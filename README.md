@@ -12,6 +12,14 @@ Each lab turns one chapter into short missions: **see the problem → predict �
 | 3 | [Transformations & matrices](ch03-transformations/index.html) | Transformations as movement, linearity test, where î and ĵ land, matrix–vector multiplication, rotation, shear, squishing onto a line |
 | 4 | [Composition](ch04-composition/index.html) | Composition of transformations, matrix product read right to left, columns of a product, AB ≠ BA, associativity |
 
+## How each lab guides you
+
+- **📘 What you'll learn**: opens automatically on your first visit (and anytime from the header): goals, why it matters, time needed, prerequisites, the mission list and the big-picture thread.
+- **🎯 Goal and 🛠 How** at the top of every mission.
+- **💡 Need help?** anytime, in three levels: a nudge, a bigger hint, then a full worked solution.
+- **📖 Glossary** of key terms up to that chapter.
+- **🌍 In real life**: a real-world use shown after each mission.
+
 ## How to use
 
 Open `index.html` (chapter list) or `ch01-vectors/index.html` in any browser. No install or internet needed apart from web fonts.
