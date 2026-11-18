@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vector Lab · What Is a Vector?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* THEME:START */
+:root{
+  --bg:#f5eee2;--paper:#fbf7ef;--ink:#2a2620;--muted:#6f675b;--line:#2a2620;--soft:#e7dccb;
+  --req:#e8833a;--res:#5e9e5a;--hs:#3c7fb8;--warn:#d64545;--accent:#cfe8b4;--accent-ink:#2f5b1f;
+  --chip1:#f6dfa3;--chip2:#d6ecc4;--chip3:#e2d7f5;--node:#f3c969;--node2:#8fb3e0;--node3:#b9a6e6;--node4:#9ccf8f;
+  --shadow:3px 3px 0 var(--line);--r:14px;
+  --mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif;
+}
+[data-theme=dark]{
+  --bg:#1c1a17;--paper:#25221e;--ink:#efe7da;--muted:#a59c8e;--line:#efe7da;--soft:#3a352e;
+  --accent:#3d5a2c;--accent-ink:#d6f0c0;--chip1:#5a4a20;--chip2:#2f4a26;--chip3:#3d3358;
+}
+/* THEME:END */
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+body{background-image:radial-gradient(var(--soft) 1px,transparent 1px);background-size:18px 18px}
+button{font:inherit;color:inherit;cursor:pointer}
+.mono{font-family:var(--mono)}
+header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg);border-bottom:2px solid var(--line)}
+.iconbtn{width:38px;height:38px;border:2px solid var(--line);border-radius:10px;background:var(--paper);display:grid;place-items:center;box-shadow:2px 2px 0 var(--line)}
+.iconbtn:active{transform:translate(2px,2px);box-shadow:none}
+.brand{font-family:var(--mono);font-weight:800;font-size:18px;flex:1}
+.brand mark{background:var(--accent);color:inherit;padding:0 4px}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 110px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+.wrap>*{min-width:0}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.crumb{font-family:var(--mono);font-size:13px;color:var(--muted)}
+h1{font-family:var(--mono);font-weight:800;font-size:clamp(26px,4vw,40px);margin:6px 0 10px;letter-spacing:-.5px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:12px;padding:4px 10px;border:2px solid var(--line);border-radius:999px;background:var(--chip1)}
+.chip:nth-child(2){background:var(--chip2)}.chip:nth-child(3){background:var(--chip3)}
+.tagline{color:var(--muted);margin:10px 0 14px}
+.stage{padding:12px;position:relative}
+.metrics{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.metric{flex:1 0 110px;border:2px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--bg)}
+.metric small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase}
+.metric b{font-family:var(--mono);font-size:18px}
+.metric.total{background:var(--accent)}
+.metric.flash b{color:var(--warn)}
+svg.scene{width:100%;height:auto;display:block;margin-top:8px}
+.legend{display:flex;gap:14px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.controls{margin-left:auto;display:flex;gap:6px}
+.stage:fullscreen{background:var(--paper);overflow:auto}
+.side{display:flex;flex-direction:column;gap:14px}
+.steps{padding:12px 14px}
+.steps .hdr{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.stepnav{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.stepnav button{min-width:30px;height:30px;border:2px solid var(--line);border-radius:8px;background:var(--bg);font-family:var(--mono);font-size:12px;padding:0 8px}
+.stepnav button.done{background:var(--chip2)}
+.stepnav button.on{background:var(--ink);color:var(--paper)}
+.panel{padding:16px 18px}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.8px;color:var(--muted)}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;border:2px solid var(--line);margin:6px 0}
+.tag.CONCEPT{background:var(--chip2)}.tag.PROBLEM{background:#f4c3c3;color:#2a2620}.tag.RECAP{background:var(--chip3)}.tag.TRY{background:var(--chip1)}
+.panel h2{font-family:var(--mono);font-size:21px;margin:6px 0 10px}
+.panel p{line-height:1.6;margin:0 0 10px}
+.box{border:2px dashed var(--line);border-radius:10px;padding:10px 12px;margin:12px 0;background:var(--bg)}
+.box .kicker{display:block;margin-bottom:4px}
+.changes div{display:flex;gap:8px;font-size:14px;margin:4px 0}
+.changes i{font-style:normal;font-family:var(--mono);font-weight:800;width:14px}
+.points{padding-left:18px;line-height:1.6}
+table.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px}
+table.tbl td{padding:4px 0;border-bottom:1px dashed var(--soft)}table.tbl td:last-child{text-align:right}
+table.tbl tr.sum td{font-weight:800;border-bottom:none;border-top:2px solid var(--line)}
+.quiz button{display:block;width:100%;text-align:left;margin:6px 0;padding:8px 10px;border:2px solid var(--line);border-radius:8px;background:var(--paper)}
+.quiz button.ok{background:var(--chip2)}.quiz button.bad{background:#f4c3c3;color:#2a2620}
+.fb{font-size:14px;margin-top:6px}
+.learn ul{padding-left:18px;line-height:1.7;margin:6px 0 0}
+.bottombar{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;gap:10px;padding:12px 16px;background:var(--bg);border-top:2px solid var(--line)}
+.bottombar button{border:2px solid var(--line);border-radius:12px;padding:12px 16px;background:var(--paper);box-shadow:2px 2px 0 var(--line);font-weight:600}
+.bottombar .next{flex:1;background:var(--accent);color:var(--accent-ink);text-align:left;display:flex;justify-content:space-between;font-family:var(--mono)}
+.bottombar button:disabled{opacity:.4;cursor:default}
+.drawer{position:fixed;inset:0 auto 0 0;width:min(360px,90vw);z-index:40;background:var(--paper);border-right:2px solid var(--line);transform:translateX(-102%);transition:transform .25s;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.scrim{position:fixed;inset:0;background:#0006;z-index:30;display:none}.scrim.open{display:block}
+.drawer .dh{display:flex;align-items:center;gap:8px;padding:14px;border-bottom:2px solid var(--line);font-family:var(--mono);font-weight:800}
+.drawer .list{overflow:auto;flex:1;padding:8px 10px}
+.mod{margin:4px 0}.mod>button{width:100%;display:flex;gap:8px;align-items:center;border:0;background:none;padding:8px 4px;font-family:var(--mono);font-weight:600;text-align:left}
+.mod .sw{width:14px;height:12px;border-radius:3px;border:1.5px solid var(--line)}
+.mod .cnt{margin-left:auto;font-size:11px;color:var(--muted)}
+.mod ul{list-style:none;margin:0 0 6px 22px;padding:0;border-left:2px dashed var(--soft)}
+.mod li a{display:block;padding:6px 10px;color:var(--ink);text-decoration:none;font-size:14px;border-radius:8px;margin-left:6px}
+.mod li a.cur{background:var(--accent);border:2px solid var(--line)}
+.mod li a.done::after{content:" ✓";color:var(--res);font-weight:800}
+.drawer .prog{padding:12px 14px;border-top:2px solid var(--line);font-family:var(--mono);font-size:13px;display:flex;justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="iconbtn" id="menuBtn" aria-label="Open course menu">☰</button>
+  <div class="brand" id="brand"></div>
+  <button class="iconbtn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+</header>
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="drawer" aria-label="Course">
+  <div class="dh"><span style="flex:1">Course</span><span class="mono" id="lessonCount" style="font-size:11px;font-weight:400"></span><button class="iconbtn" id="closeDrawer" aria-label="Close menu">✕</button></div>
+  <div class="list" id="courseList"></div>
+  <div class="prog"><span>PROGRESS</span><span id="progTxt"></span></div>
+</nav>
+
+<main class="wrap">
+  <section>
+    <div class="crumb" id="crumb"></div>
+    <h1 id="title"></h1>
+    <div class="chips" id="chips"></div>
+    <p class="tagline" id="tagline"></p>
+    <div class="card stage" id="stage">
+      <div class="metrics" id="metrics"></div>
+      <svg class="scene" id="scene" viewBox="0 0 720 400" role="img" aria-label="Animated diagram"></svg>
+      <div class="legend" id="legend">
+        <span><i class="dot" style="background:var(--req)"></i>request</span>
+        <span><i class="dot" style="background:var(--res)"></i>response</span>
+        <span><i class="dot" style="border:2px solid var(--hs)"></i>handshake</span>
+        <div class="controls">
+          <button class="iconbtn" id="restartBtn" aria-label="Restart lesson">↺</button>
+          <button class="iconbtn" id="pauseBtn" aria-label="Pause animation">❚❚</button>
+          <button class="iconbtn" id="fsBtn" aria-label="Full screen">⤢</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <aside class="side">
+    <div class="card steps">
+      <div class="hdr"><span>In this lesson</span><span id="stepCount"></span></div>
+      <div class="stepnav" id="stepNav"></div>
+    </div>
+    <article class="card panel" id="panel" aria-live="polite"></article>
+    <div class="card panel learn" id="learn"></div>
+  </aside>
+</main>
+
+<div class="bottombar">
+  <button id="backBtn">← Back</button>
+  <button class="next" id="nextBtn"><span id="nextTxt"></span><span>→</span></button>
+</div>
+
+<script>
+/* COURSE-DATA:START — the only part you rewrite for a new lesson/course */
+const COURSE = {
+  brand: 'Vector <mark>Lab</mark>',
+  storageKey: 'vlab-lessons',
+  modules: [
+    { name: 'Vectors & Space', color: '#e2b44a', lessons: [
+      {
+        slug: 'vectors',
+        title: 'What Is a Vector?',
+        minutes: 12, level: 'Beginner',
+        tagline: 'Follow one warehouse robot through a single order and discover that every move it makes is just two numbers.',
+        learn: ['How two numbers describe any spot on a floor (coordinates)','Three ways to see a vector: arrow, list of numbers, something you add and scale','Adding vectors tip to tail, or by adding matching numbers','Scaling: stretching, shrinking and flipping a vector','Why a command is a movement: target − start','Going from 2D to 3D with a third number'],
+        nextTeaser: 'Span & Basis: give the robot two knobs instead of a keypad, and find out which shelves it can reach.',
+        unit: 'm',
+        metrics: [ {id:'toShelf',label:'Dock → Shelf A'},{id:'toPack',label:'Shelf A → Packing'},{id:'shelfB',label:'Dock → Shelf B'},{id:'detour',label:'Detours'} ],
+        nodes: [
+          {id:'dock',label:'Dock',sub:'(0, 0)',kind:'robot',gx:0,gy:0,color:'var(--node4)'},
+          {id:'charger',label:'Charger',sub:'(2, 0)',kind:'hex',gx:2,gy:0,color:'var(--node)'},
+          {id:'shelfA',label:'Shelf A',sub:'(1, 2)',kind:'box',gx:1,gy:2,color:'var(--node)'},
+          {id:'miss',label:'Wrong spot',sub:'(3, 2)',kind:'mark',gx:3,gy:2},
+          {id:'pack',label:'Packing',sub:'(4, 1)',kind:'hex',gx:4,gy:1,color:'var(--node2)'},
+          {id:'shelfB',label:'Shelf B',sub:'(2, 4)',kind:'box',gx:2,gy:4,color:'var(--node3)'}
+        ],
+        edges: [['dock','shelfA'],['shelfA','pack'],['dock','pack'],['dock','shelfB'],['charger','miss'],['miss','shelfA'],['charger','shelfA']],
+        steps: [
+          { nav:'New order', tag:'CONCEPT', title:'An order comes in',
+            body:['A customer orders one parcel. Robot R1 waits at the <b>dock</b>, the corner of the warehouse where every measurement starts.','The floor is a grid of 1-metre squares. Aisles run in two directions: <b>x</b> and <b>y</b>.'],
+            key:'The dock is the <b>origin</b>, (0, 0). Every position on the floor is measured from here.',
+            show:['dock'], flows:[], labels:{dock:'R1 · waiting at origin'}, metrics:{} },
+          { nav:'Read coords', tag:'CONCEPT', title:'Two numbers find the shelf',
+            body:['The parcel is on Shelf A. To get there, R1 walks <b>1 m along x</b>, then <b>2 m along y</b>.','Those two instructions are the shelf\'s <b>coordinates</b>. Written as a vector, they stack vertically: [1; 2].'],
+            points:['First number = x, second = y. Order matters.','Positive goes one way along an aisle, negative goes the other.','Every pair of numbers is exactly one spot, and every spot is exactly one pair.'],
+            key:'A vector\'s coordinates are instructions: how far along x, then how far along y, starting from the origin.',
+            show:['dock','shelfA'], flows:[{from:'dock',to:'shelfA',kind:'request',label:'[1; 2]',dx:-60,dy:-6}],
+            metrics:{toShelf:3} },
+          { nav:'3 views', tag:'TRY', title:'One vector, three ways to see it',
+            body:['The command [1; 2] can be seen three ways. An <b>arrow</b> from the dock to the shelf (physics). A <b>list</b> of two numbers (computer science), like storing a parcel as [weight; price]. And something you can <b>add and scale</b> (maths).'],
+            points:['In linear algebra the arrow\'s tail almost always sits at the origin.','The real power is switching views: picture the arrow, compute with the list.'],
+            key:'Arrow and list are the same vector. Linear algebra is the skill of translating between them.',
+            show:['dock','shelfA'], flows:[{from:'dock',to:'shelfA',kind:'request',label:'arrow = list [1; 2]',dx:-95,dy:-30}], labels:{shelfA:'tip of the arrow'},
+            metrics:{toShelf:3},
+            quiz:{q:'In the vector [1; 2], which number says how far to move along x?',options:['The top number, 1','The bottom number, 2','Both together'],answer:0,why:'The top (first) number is always x. The bottom one is y.'} },
+          { nav:'Tip to tail', tag:'CONCEPT', title:'A second command, from where it stands',
+            body:['Now R1 carries the parcel to Packing with command B = [3; −1]: 3 m along x, then 1 m back along y.','B starts at the <b>tip</b> of the first move, not at the dock. This is the one time vectors leave the origin.'],
+            key:'Two moves in a row: put the second arrow\'s tail on the first arrow\'s tip.',
+            changes:[['+','Second leg: Shelf A → Packing, 4 m walked']],
+            show:['dock','shelfA','pack'], flows:[{from:'dock',to:'shelfA',kind:'request',label:'A = [1; 2]',dx:-60,dy:-6},{from:'shelfA',to:'pack',kind:'request',label:'B = [3; −1]',dy:-16}], labels:{pack:'drop parcel'},
+            metrics:{toShelf:3,toPack:4} },
+          { nav:'Add them', tag:'TRY', title:'One command instead of two',
+            body:['Where did R1 end up overall? Add the matching numbers: x is 1 + 3 = 4, y is 2 + (−1) = 1. One command, <b>A + B = [4; 1]</b>, lands at the same spot.','It\'s like the number line: 2 steps then 5 steps is the same as 7 steps.'],
+            key:'Vector addition = tip to tail on the picture = add the matching numbers on paper.',
+            show:['dock','shelfA','pack'], flows:[{from:'dock',to:'pack',kind:'response',label:'A + B = [4; 1]',dy:-10}], labels:{pack:'same spot (4, 1)'},
+            metrics:{toShelf:3,toPack:4},
+            quiz:{q:'If R1 did B first and then A, where would it end up?',options:['The same spot, (4, 1)','A different spot','Back at the dock'],answer:0,why:'Order doesn\'t matter for addition: [3; −1] + [1; 2] = [4; 1] too. The two paths make a parallelogram.'} },
+          { nav:'Scale', tag:'CONCEPT', title:'Twice as far, same direction',
+            body:['A second item is on Shelf B, in exactly the same direction as Shelf A but twice as far. Its command is <b>2 · [1; 2] = [2; 4]</b>: multiply every number by 2.','The 2 is a <b>scalar</b>. It stretches the vector without turning it.'],
+            points:['× 2 stretches to twice the length.','× ½ shrinks to half: [0.5; 1].','× −1 flips it to point the other way: [−1; −2].'],
+            key:'Scaling = multiply each number by the scalar. Numbers in linear algebra mostly do exactly this.',
+            show:['dock','shelfA','pack','shelfB'], flows:[{from:'dock',to:'shelfB',kind:'request',label:'2 · [1; 2] = [2; 4]',dx:-115,dy:-40}], labels:{shelfB:'2× as far'},
+            metrics:{toShelf:3,toPack:4,shelfB:6} },
+          { nav:'Wrong start', tag:'PROBLEM', title:'Case: R1 starts at the charger',
+            body:['Next morning, R1 starts from the <b>charger at (2, 0)</b>. The operator reuses yesterday\'s note: "[1; 2] gets to Shelf A".','R1 walks 1 along x and 2 along y, and arrives at <b>(3, 2)</b>: an empty aisle. It has to walk 2 m back.'],
+            key:'A command is a <b>movement</b>, not a place. The same movement from a different start ends somewhere else.',
+            changes:[['~','Start: dock (0, 0) → charger (2, 0)'],['+','Wrong spot (3, 2), 3 m wasted + 2 m back'],['~','Detours: 0 → 5 m']],
+            show:['charger','shelfA','miss','pack','shelfB','dock'], flows:[{from:'charger',to:'miss',kind:'request',label:'old note [1; 2]',dx:-10,dy:22},{from:'miss',to:'shelfA',kind:'response',label:'walk back 2 m',dx:-20,dy:44}],
+            warn:['miss'], labels:{charger:'R1 starts here'},
+            metrics:{toShelf:3,toPack:4,shelfB:6,detour:5}, flash:['detour'] },
+          { nav:'Fix it', tag:'CONCEPT', title:'Movement = target − start',
+            body:['The right command subtracts where R1 <b>is</b> from where it <b>needs to be</b>: [1; 2] − [2; 0] = <b>[−1; 2]</b>. That\'s 1 m back along x and 2 m along y.','Check it: start + movement = [2; 0] + [−1; 2] = [1; 2]. Shelf A ✓.'],
+            key:'A position is measured from the origin. A movement is measured from wherever you are: target − start.',
+            changes:[['-','Old note [1; 2] and the 5 m detour'],['+','Correct command [−1; 2], 3 m']],
+            show:['charger','shelfA','pack','shelfB','dock'], flows:[{from:'charger',to:'shelfA',kind:'response',label:'[−1; 2]',dy:10}], labels:{shelfA:'reached ✓'},
+            metrics:{toShelf:3,toPack:4,shelfB:6} },
+          { nav:'Go 3D', tag:'CONCEPT', title:'Add a third number for height',
+            body:['Real racks have levels. Add a <b>z-axis</b> pointing straight up, at right angles to x and y. Now every spot needs three numbers: [1; 2; 3] means 1 along x, 2 along y, then up 3 levels.'],
+            points:['2D vectors have two numbers; 3D vectors have three.','Every triplet is exactly one spot in space, and every spot is exactly one triplet.','Adding and scaling work the same way, number by number.'],
+            key:'The dimension is just how many numbers the list has.',
+            show:['dock','shelfA','pack','shelfB'], flows:[{from:'dock',to:'shelfA',kind:'request',label:'[1; 2; 3] → level 3',dx:-80,dy:-6}], labels:{shelfA:'top level · z = 3'},
+            metrics:{toShelf:3,toPack:4,shelfB:6},
+            quiz:{q:'A drone flies inside the warehouse. How many numbers does its position vector need?',options:['2','3','4'],answer:1,why:'x, y and height z: an ordered triplet.'} },
+          { nav:'Recap', tag:'RECAP', title:'The day, in vectors',
+            body:['Every move R1 made was a vector: a list of numbers you can picture as an arrow. Two operations did all the work: <b>adding</b> and <b>scaling</b>.'],
+            points:['Coordinates are instructions from the origin, x first, then y.','Add vectors by adding matching numbers; order doesn\'t matter.','Scale by multiplying every number; negative flips the direction.','A command is a movement: target − start.'],
+            table:{title:'Metres walked',rows:[['Dock → Shelf A  [1; 2]','3 m'],['Shelf A → Packing  [3; −1]','4 m'],['Dock → Shelf B  2·[1; 2]','6 m']],sum:['total','13 m'],foot:'The 5 m detour disappeared once R1 used target − start.'},
+            show:['dock','shelfA','pack','shelfB'], flows:[{from:'dock',to:'pack',kind:'response',label:'order done · 13 m',dy:-10}],
+            metrics:{toShelf:3,toPack:4,shelfB:6} }
+        ]
+      }
+    ]}
+  ]
+};
+/* COURSE-DATA:END */
+
+/* ENGINE:START — reusable; do not edit per lesson */
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const ALL=COURSE.modules.flatMap((m,mi)=>m.lessons.map((l,li)=>({...l,mi,li,module:m})));
+let L=ALL[0], S=0, playing=true, raf=0, packets=[];
+const doneKey=COURSE.storageKey+'-done';
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function layout(){ // centre the iso grid in the viewBox
+  const pts=L.nodes.map(n=>({x:(n.gx-n.gy)*72,y:(n.gx+n.gy)*44}));
+  const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
+  const ox=360-(Math.min(...xs)+Math.max(...xs))/2, oy=200-(Math.min(...ys)+Math.max(...ys))/2;
+  L.nodes.forEach((n,i)=>{n.x=pts[i].x+ox;n.y=pts[i].y+oy;});
+}
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e;}
+function tile(g,x,y,w=58){el('polygon',{points:`${x},${y-w*.5} ${x+w},${y} ${x},${y+w*.5} ${x-w},${y}`,fill:'var(--paper)',stroke:'var(--line)','stroke-width':2},g);
+  el('polygon',{points:`${x-w},${y} ${x},${y+w*.5} ${x},${y+w*.5+8} ${x-w},${y+8}`,fill:'var(--soft)',stroke:'var(--line)','stroke-width':2},g);
+  el('polygon',{points:`${x+w},${y} ${x},${y+w*.5} ${x},${y+w*.5+8} ${x+w},${y+8}`,fill:'var(--bg)',stroke:'var(--line)','stroke-width':2},g);}
+function pill(g,x,y,text,warn){const t=el('text',{x,y,'text-anchor':'middle','font-family':'JetBrains Mono, monospace','font-size':11,fill:warn?'#fff':'var(--ink)'});t.textContent=text;g.appendChild(t);
+  const w=Math.max(40,text.length*6.9+16);const r=el('rect',{x:x-w/2,y:y-13,width:w,height:19,rx:9.5,fill:warn?'var(--warn)':'var(--paper)',stroke:'var(--line)','stroke-width':1.5});g.insertBefore(r,t);}
+function drawNode(g,n,step){
+  const warn=(step.warn||[]).includes(n.id);const x=n.x,y=n.y;
+  tile(g,x,y);
+  const fill=warn?'#f4c3c3':(n.color||'var(--node)');
+  if(n.kind==='laptop'){
+    el('polygon',{points:`${x-30},${y-2} ${x+2},${y+14} ${x+30},${y} ${x-2},${y-16}`,fill:'var(--soft)',stroke:'var(--line)','stroke-width':2},g);
+    el('polygon',{points:`${x-30},${y-2} ${x-2},${y-16} ${x-2},${y-56} ${x-30},${y-42}`,fill:'#3b3a40',stroke:'var(--line)','stroke-width':2},g);
+    el('polygon',{points:`${x-26},${y-8} ${x-6},${y-18} ${x-6},${y-50} ${x-26},${y-40}`,fill:'#b9a6e6'},g);
+  }else if(n.kind==='cyl'){
+    el('path',{d:`M${x-22},${y-40} v28 a22,9 0 0 0 44,0 v-28`,fill,stroke:'var(--line)','stroke-width':2},g);
+    el('ellipse',{cx:x,cy:y-40,rx:22,ry:9,fill,stroke:'var(--line)','stroke-width':2},g);
+  }else if(n.kind==='robot'){
+    el('line',{x1:x,y1:y-46,x2:x,y2:y-57,stroke:'var(--line)','stroke-width':2},g);
+    el('circle',{cx:x,cy:y-59,r:3.5,fill:'var(--warn)',stroke:'var(--line)','stroke-width':1.5},g);
+    el('rect',{x:x-17,y:y-46,width:34,height:32,rx:8,fill,stroke:'var(--line)','stroke-width':2},g);
+    el('circle',{cx:x-7,cy:y-33,r:3.5,fill:'var(--ink)'},g);el('circle',{cx:x+7,cy:y-33,r:3.5,fill:'var(--ink)'},g);
+    el('rect',{x:x-8,y:y-24,width:16,height:4,rx:2,fill:'var(--ink)'},g);
+  }else if(n.kind==='box'){
+    const s=20,cy=y-36;
+    el('polygon',{points:`${x-s},${cy} ${x},${cy+s*.5} ${x},${cy+s*1.5} ${x-s},${cy+s}`,fill,stroke:'var(--line)','stroke-width':2,'fill-opacity':.8},g);
+    el('polygon',{points:`${x+s},${cy} ${x},${cy+s*.5} ${x},${cy+s*1.5} ${x+s},${cy+s}`,fill,stroke:'var(--line)','stroke-width':2,'fill-opacity':.6},g);
+    el('polygon',{points:`${x},${cy-s*.5} ${x+s},${cy} ${x},${cy+s*.5} ${x-s},${cy}`,fill,stroke:'var(--line)','stroke-width':2},g);
+    el('path',{d:`M${x-s*.5},${cy-s*.25} L${x+s*.5},${cy+s*.25}`,stroke:'var(--line)','stroke-width':1.5},g);
+  }else if(n.kind==='mark'){
+    el('circle',{cx:x,cy:y-8,r:17,fill:'none',stroke:'var(--warn)','stroke-width':3,'stroke-dasharray':'5 4'},g);
+    el('path',{d:`M${x-8},${y-16} L${x+8},${y} M${x+8},${y-16} L${x-8},${y}`,stroke:'var(--warn)','stroke-width':3},g);
+  }else{ // hex block
+    const h=22,r=26;const top=[0,1,2,3,4,5].map(i=>{const a=Math.PI/3*i;return [x+r*Math.cos(a),y-34+r*.55*Math.sin(a)]});
+    el('path',{d:`M${x-r},${y-34} L${x-r},${y-34+h} A${r},${r*.55} 0 0 0 ${x+r},${y-34+h} L${x+r},${y-34} Z`,fill,stroke:'var(--line)','stroke-width':2,opacity:.92},g);
+    el('polygon',{points:top.map(p=>p.join(',')).join(' '),fill,stroke:'var(--line)','stroke-width':2},g);
+  }
+  pill(g,x,y+52,n.sub?`${n.label} · ${n.sub}`:n.label);
+  const extra=(step.labels||{})[n.id];if(extra)pill(g,x,n.kind==='laptop'?y-66:y-62,extra,warn);
+}
+function render(){
+  const step=L.steps[S];const svg=$('#scene');svg.innerHTML='';layout();
+  const shown=new Set(step.show||L.nodes.map(n=>n.id));const by=Object.fromEntries(L.nodes.map(n=>[n.id,n]));
+  const ge=el('g',{},svg),gn=el('g',{},svg),gl=el('g',{},svg);
+  L.edges.forEach(([a,b])=>{if(!shown.has(a)||!shown.has(b))return;const A=by[a],B=by[b];
+    el('line',{x1:A.x,y1:A.y,x2:B.x,y2:B.y,stroke:'var(--line)','stroke-width':2,'stroke-dasharray':'4 5',opacity:.55},ge);});
+  [...L.nodes].sort((a,b)=>a.y-b.y).forEach(n=>{if(shown.has(n.id))drawNode(gn,n,step)});
+  packets=[];
+  (step.flows||[]).forEach((f,i)=>{const A=by[f.from],B=by[f.to];if(!A||!B)return;
+    const mx=(A.x+B.x)/2+(f.dx||0),my=(A.y+B.y)/2+(f.from<f.to?-14:14)+(f.dy||0);
+    if(f.label)pill(gl,mx,my,f.label);
+    const col=f.kind==='response'?'var(--res)':f.kind==='handshake'?'var(--hs)':'var(--req)';
+    const c=el('circle',{r:6,fill:f.kind==='handshake'?'var(--paper)':col,stroke:f.kind==='handshake'?col:'var(--line)','stroke-width':f.kind==='handshake'?3:1.5},gl);
+    packets.push({c,A,B,off:i*0.5,dur:f.kind==='handshake'?1.4:1.8,bounce:f.kind==='handshake'});});
+  renderMetrics(step);renderPanel(step);renderNav();
+  $('#stepCount').textContent=`Step ${S+1} of ${L.steps.length}`;
+  $('#backBtn').disabled=S===0&&ALL.indexOf(L)===0;
+  const nxt=L.steps[S+1];const nl=ALL[ALL.indexOf(L)+1];
+  $('#nextTxt').textContent=nxt?`Next: ${nxt.nav}`:(nl?`Next lesson: ${nl.title}`:'Finish lesson');
+  if(location.hash!==`#/${L.slug}/${S+1}`)history.replaceState(null,'',`#/${L.slug}/${S+1}`);
+}
+function tick(t){
+  packets.forEach(p=>{let k=((t/1000)/p.dur+p.off)%1;if(p.bounce)k=k<.5?k*2:2-k*2;const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    p.c.setAttribute('cx',p.A.x+(p.B.x-p.A.x)*e);p.c.setAttribute('cy',p.A.y+(p.B.y-p.A.y)*e);});
+  if(playing&&!reduce)raf=requestAnimationFrame(tick);
+}
+function startAnim(){cancelAnimationFrame(raf);if(reduce){packets.forEach(p=>{p.c.setAttribute('cx',(p.A.x+p.B.x)/2);p.c.setAttribute('cy',(p.A.y+p.B.y)/2)});return;}raf=requestAnimationFrame(tick);}
+let shownVals={};
+function renderMetrics(step){
+  const box=$('#metrics');const u=L.unit||'';const m=step.metrics||{};
+  if(!box.dataset.lesson||box.dataset.lesson!==L.slug){box.dataset.lesson=L.slug;shownVals={};box.innerHTML=L.metrics.map(x=>`<div class="metric" data-id="${x.id}"><small>${x.label}</small><b>—</b></div>`).join('')+`<div class="metric total" data-id="_total"><small>Total</small><b>—</b></div>`;}
+  const vals={...m};const keys=L.metrics.map(x=>x.id);const has=keys.some(k=>m[k]!=null);
+  vals._total=has?keys.reduce((s,k)=>s+(m[k]||0),0):null;
+  [...keys,'_total'].forEach(k=>{const card=box.querySelector(`[data-id="${k}"]`);const b=card.querySelector('b');const to=vals[k];
+    card.classList.toggle('flash',(step.flash||[]).includes(k));
+    if(to==null){b.textContent='—';shownVals[k]=0;return;}
+    const from=shownVals[k]||0;shownVals[k]=to;const t0=performance.now();
+    const run=t=>{const k2=Math.min(1,(t-t0)/500);b.textContent=Math.round(from+(to-from)*k2)+(u?' '+u:'');if(k2<1)requestAnimationFrame(run)};reduce?b.textContent=to+(u?' '+u:''):requestAnimationFrame(run);});
+}
+function renderPanel(step){
+  let h=`<span class="kicker">STEP ${S+1} / ${L.steps.length}</span><br><span class="tag ${step.tag||'CONCEPT'}">${step.tag||'CONCEPT'}</span><h2>${step.title}</h2>`;
+  (step.body||[]).forEach(p=>h+=`<p>${p}</p>`);
+  if(step.points)h+=`<ul class="points">${step.points.map(p=>`<li>${p}</li>`).join('')}</ul>`;
+  if(step.key)h+=`<div class="box"><span class="kicker">KEY IDEA</span>${step.key}</div>`;
+  if(step.changes)h+=`<div class="box changes"><span class="kicker">WHAT CHANGED</span>${step.changes.map(([o,t])=>`<div><i>${o}</i><span>${t}</span></div>`).join('')}</div>`;
+  if(step.table){const T=step.table;h+=`<div class="box"><span class="kicker">${T.title.toUpperCase()}</span><table class="tbl">${T.rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}${T.sum?`<tr class="sum"><td>${T.sum[0]}</td><td>${T.sum[1]}</td></tr>`:''}</table>${T.foot?`<div class="fb">${T.foot}</div>`:''}</div>`;}
+  if(step.quiz){const Q=step.quiz;h+=`<div class="box quiz"><span class="kicker">QUICK CHECK</span><div>${Q.q}</div>${Q.options.map((o,i)=>`<button data-i="${i}">${o}</button>`).join('')}<div class="fb" id="qfb"></div></div>`;}
+  if(S===L.steps.length-1&&L.nextTeaser)h+=`<div class="box"><span class="kicker">COMING UP</span>Next up: ${L.nextTeaser}</div>`;
+  $('#panel').innerHTML=h;
+  if(step.quiz)$('#panel').querySelectorAll('.quiz button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,Q=step.quiz;
+    b.classList.add(i===Q.answer?'ok':'bad');$('#qfb').innerHTML=(i===Q.answer?'✓ Right. ':'✗ Not quite. ')+Q.why;});
+}
+function renderNav(){
+  const done=store.get(doneKey,{});const seen=done[L.slug+':steps']||0;
+  $('#stepNav').innerHTML=L.steps.map((s,i)=>`<button class="${i===S?'on':''} ${i<seen?'done':''}" data-i="${i}" title="${s.nav}">${i===S?`${i+1} ${s.nav}`:i+1}</button>`).join('');
+  $('#stepNav').querySelectorAll('button').forEach(b=>b.onclick=()=>go(+b.dataset.i));
+}
+function renderHead(){
+  const m=L.module;$('#brand').innerHTML=COURSE.brand;document.title=`${L.title} · ${COURSE.brand.replace(/<[^>]+>/g,'')}`;
+  $('#crumb').textContent=`${String(L.mi+1).padStart(2,'0')}. ${m.name} / Lesson ${L.li+1} of ${m.lessons.length}`;
+  $('#title').textContent=L.title;$('#tagline').textContent=L.tagline;
+  $('#chips').innerHTML=`<span class="chip">⏱ ${L.minutes} min</span><span class="chip">▮ ${L.level}</span><span class="chip">☰ ${L.steps.length} steps</span>`;
+  $('#learn').innerHTML=`<span class="kicker">YOU’LL LEARN</span><ul>${L.learn.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  renderDrawer();
+}
+function renderDrawer(){
+  const done=store.get(doneKey,{});const total=ALL.length;const n=ALL.filter(l=>done[l.slug]).length;
+  $('#lessonCount').textContent=`${total} lessons`;$('#progTxt').textContent=`${n} / ${total}`;
+  $('#courseList').innerHTML=COURSE.modules.map((m,mi)=>`<div class="mod"><button aria-expanded="true"><span class="sw" style="background:${m.color}"></span>${String(mi+1).padStart(2,'0')}. ${m.name}<span class="cnt">${m.lessons.filter(l=>done[l.slug]).length}/${m.lessons.length}</span></button><ul>${m.lessons.map(l=>`<li><a href="#/${l.slug}/1" class="${l.slug===L.slug?'cur':''} ${done[l.slug]?'done':''}">${l.title}</a></li>`).join('')}</ul></div>`).join('');
+  $('#courseList').querySelectorAll('.mod>button').forEach(b=>b.onclick=()=>{const ul=b.nextElementSibling;const o=ul.style.display!=='none';ul.style.display=o?'none':'';b.setAttribute('aria-expanded',!o)});
+  $('#courseList').querySelectorAll('a').forEach(a=>a.onclick=()=>toggleDrawer(false));
+}
+function markSeen(){const d=store.get(doneKey,{});d[L.slug+':steps']=Math.max(d[L.slug+':steps']||0,S+1);if(S===L.steps.length-1)d[L.slug]=true;store.set(doneKey,d);}
+function go(i){S=Math.max(0,Math.min(L.steps.length-1,i));markSeen();render();startAnim();}
+function openLesson(slug,step=0){const l=ALL.find(x=>x.slug===slug)||ALL[0];const changed=l!==L;L=l;if(changed)$('#metrics').dataset.lesson='';renderHead();go(step);window.scrollTo({top:0});}
+function next(){if(S<L.steps.length-1)return go(S+1);const nl=ALL[ALL.indexOf(L)+1];if(nl)openLesson(nl.slug,0);else{markSeen();renderDrawer();}}
+function back(){if(S>0)return go(S-1);const pl=ALL[ALL.indexOf(L)-1];if(pl)openLesson(pl.slug,pl.steps.length-1);}
+function route(){const m=location.hash.match(/^#\/([\w-]+)\/(\d+)/);if(m)openLesson(m[1],+m[2]-1);else openLesson(ALL[0].slug,0);}
+function toggleDrawer(o){$('#drawer').classList.toggle('open',o);$('#scrim').classList.toggle('open',o);}
+$('#nextBtn').onclick=next;$('#backBtn').onclick=back;
+$('#restartBtn').onclick=()=>go(0);
+$('#pauseBtn').onclick=()=>{playing=!playing;$('#pauseBtn').textContent=playing?'❚❚':'▶';$('#pauseBtn').setAttribute('aria-label',playing?'Pause animation':'Play animation');if(playing)startAnim();};
+$('#fsBtn').onclick=()=>{const s=$('#stage');try{document.fullscreenElement?document.exitFullscreen():s.requestFullscreen()}catch(e){}};
+$('#menuBtn').onclick=()=>toggleDrawer(true);$('#closeDrawer').onclick=$('#scrim').onclick=()=>toggleDrawer(false);
+$('#themeBtn').onclick=()=>{const d=document.documentElement.dataset.theme==='dark'?'':'dark';document.documentElement.dataset.theme=d;store.set(COURSE.storageKey+'-theme',d)};
+document.documentElement.dataset.theme=store.get(COURSE.storageKey+'-theme','');
+addEventListener('keydown',e=>{if(e.target.closest('input,textarea'))return;if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')back();if(e.key===' '){e.preventDefault();$('#pauseBtn').click()}if(e.key==='Escape')toggleDrawer(false)});
+addEventListener('hashchange',()=>{const m=location.hash.match(/^#\/([\w-]+)\/(\d+)/);if(m&&(m[1]!==L.slug||+m[2]-1!==S))route();});
+route();
+/* ENGINE:END */
+</script>
+</body>
+</html>

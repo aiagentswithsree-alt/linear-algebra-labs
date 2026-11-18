@@ -12,6 +12,14 @@ Each lab turns one chapter into short missions: **see the problem → predict �
 | 3 | [Transformations & matrices](ch03-transformations/index.html) | Transformations as movement, linearity test, where î and ĵ land, matrix–vector multiplication, rotation, shear, squishing onto a line |
 | 4 | [Composition](ch04-composition/index.html) | Composition of transformations, matrix product read right to left, columns of a product, AB ≠ BA, associativity |
 
+## Step-through lessons (trial)
+
+A lighter, read-and-watch version of each chapter: an animated diagram, one short step at a time, with a running total and optional quick checks.
+
+| Lesson | Topic |
+|---|---|
+| 1 | [What is a vector?](lessons/ch01-vectors/index.html): one warehouse robot, one order (about 12 min) |
+
 ## How each lab guides you
 
 - **📘 What you'll learn**: opens automatically on your first visit (and anytime from the header): goals, why it matters, time needed, prerequisites, the mission list and the big-picture thread.
